@@ -25,9 +25,12 @@ def create_post(player, location, content):
         player=player,
         content=content,
     )
+    # Note content stays on the board where moderation (is_hidden, delete)
+    # applies; town events have no link back to the post, so a copy here
+    # would outlive hiding or deleting the note.
     TownEvent.objects.create(
         town=player.town,
         title=f"{player.user.username} left a note at {location.name}",
-        body=content,
+        body="",
     )
     return post

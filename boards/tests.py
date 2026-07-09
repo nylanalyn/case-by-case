@@ -20,6 +20,16 @@ class BoardTests(TestCase):
         profile.refresh_from_db()
         self.assertEqual(profile.daily_actions_remaining, 19)
 
+    def test_note_content_is_not_copied_into_town_events(self):
+        user = User.objects.create_user(username="rumi", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        location = Location.objects.get(town=profile.town, slug="diner")
+
+        create_post(profile, location, "Rumor: the mayor is three ducks in a coat.")
+
+        event = TownEvent.objects.get(town=profile.town, title__contains="left a note")
+        self.assertEqual(event.body, "")
+
     def test_player_can_delete_own_post(self):
         user = User.objects.create_user(username="mara", password="safe-password-123")
         profile = ensure_player_profile(user)

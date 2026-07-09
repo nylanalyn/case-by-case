@@ -1,13 +1,17 @@
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "dev-only-change-me-please-set-secret-key-before-deploying",
-)
+DEV_ONLY_SECRET_KEY = "dev-only-change-me-please-set-secret-key-before-deploying"
+SECRET_KEY = os.environ.get("SECRET_KEY", DEV_ONLY_SECRET_KEY)
 DEBUG = os.environ.get("DEBUG", "1") == "1"
+if not DEBUG and SECRET_KEY == DEV_ONLY_SECRET_KEY:
+    raise ImproperlyConfigured(
+        "SECRET_KEY must be set via environment variable when DEBUG is off."
+    )
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 INSTALLED_APPS = [
