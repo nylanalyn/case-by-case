@@ -52,7 +52,7 @@
     <article class="card">
       <p>{{ post.content }}</p>
       <small>{{ post.player.user.username }} pinned this on {{ post.created_at }}</small>
-      {% if post.player_id == profile.id %}
+      {% if post.player_id == profile.id or user.is_staff %}
         <form method="post" action="{% url 'delete_board_post' post.id %}">
           {% csrf_token %}
           <button type="submit">Remove note</button>

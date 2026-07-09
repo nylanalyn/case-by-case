@@ -31,6 +31,34 @@ class BoardTests(TestCase):
         self.assertRedirects(response, f"/town/locations/{location.slug}/")
         self.assertFalse(MessageBoardPost.objects.filter(id=post.id).exists())
 
+    def test_player_cannot_delete_another_players_post(self):
+        owner = User.objects.create_user(username="mara", password="safe-password-123")
+        other = User.objects.create_user(username="halden", password="safe-password-123")
+        owner_profile = ensure_player_profile(owner)
+        ensure_player_profile(other)
+        location = Location.objects.get(town=owner_profile.town, slug="diner")
+        post = create_post(owner_profile, location, "Back booth is sticky.")
+
+        self.client.force_login(other)
+        response = self.client.post(f"/boards/posts/{post.id}/delete/")
+
+        self.assertRedirects(response, f"/town/locations/{location.slug}/")
+        self.assertTrue(MessageBoardPost.objects.filter(id=post.id).exists())
+
+    def test_staff_can_delete_another_players_post(self):
+        owner = User.objects.create_user(username="june", password="safe-password-123")
+        staff = User.objects.create_user(username="operator", password="safe-password-123", is_staff=True)
+        owner_profile = ensure_player_profile(owner)
+        ensure_player_profile(staff)
+        location = Location.objects.get(town=owner_profile.town, slug="diner")
+        post = create_post(owner_profile, location, "This should come down.")
+
+        self.client.force_login(staff)
+        response = self.client.post(f"/boards/posts/{post.id}/delete/")
+
+        self.assertRedirects(response, f"/town/locations/{location.slug}/")
+        self.assertFalse(MessageBoardPost.objects.filter(id=post.id).exists())
+
     def test_posting_has_simple_cooldown(self):
         user = User.objects.create_user(username="iris", password="safe-password-123")
         profile = ensure_player_profile(user)

@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from accounts.services import ensure_player_profile
 from cases.models import Case, PlayerCaseProgress, PlayerClue
-from cases.services import WrongLocation, advance_case
+from cases.services import WrongLocation, advance_case, reset_case_progress
 from towns.models import Location, TownEvent
 
 
@@ -36,3 +36,17 @@ class CaseTests(TestCase):
 
         with self.assertRaises(WrongLocation):
             advance_case(profile, case, location=library)
+
+    def test_reset_case_progress_clears_case_clues(self):
+        user = User.objects.create_user(username="iris", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        diner = Location.objects.get(town=profile.town, slug="diner")
+        progress, _clue = advance_case(profile, case, location=diner)
+
+        reset_case_progress(progress)
+
+        progress.refresh_from_db()
+        self.assertEqual(progress.status, PlayerCaseProgress.ACTIVE)
+        self.assertEqual(progress.step, 0)
+        self.assertEqual(PlayerClue.objects.filter(player=profile, clue__case=case).count(), 0)

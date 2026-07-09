@@ -14,7 +14,7 @@ def delete_post(request, post_id):
     location_slug = post.location.slug
     if request.method != "POST":
         return redirect("location_detail", slug=location_slug)
-    if post.player_id != profile.id:
+    if post.player_id != profile.id and not request.user.is_staff:
         messages.error(request, "You can only remove your own notes.")
         return redirect("location_detail", slug=location_slug)
     post.delete()

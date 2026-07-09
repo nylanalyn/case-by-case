@@ -217,6 +217,26 @@ Message board requirements:
 
 Player messages should make the town feel lived-in, not chaotic.
 
+## Admin and Operator Controls
+
+The game needs basic trusted-operator controls early, before broader playtesting.
+
+Initial admin controls should use Django staff/admin permissions rather than a custom dashboard.
+
+Admins should be able to:
+
+* reset a player's daily actions
+* run or trigger daily rollover
+* reset a player's case progress
+* remove or hide message board posts
+* review basic player, town, case, and board state
+
+Admin actions should be logged where practical.
+
+Do not expose destructive controls to normal players.
+
+Do not build a large custom admin console before the core game loop is stable.
+
 ## Daily Newspaper
 
 Eventually, the town may have a daily newspaper.

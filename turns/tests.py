@@ -3,6 +3,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from accounts.services import ensure_player_profile
+from accounts.services import reset_daily_actions
 from turns.services import NotEnoughActions, spend_action
 
 
@@ -27,6 +28,17 @@ class TurnTests(TestCase):
         profile.save()
 
         call_command("rollover")
+        profile.refresh_from_db()
+
+        self.assertEqual(profile.daily_actions_remaining, 20)
+
+    def test_reset_daily_actions_helper(self):
+        user = User.objects.create_user(username="june", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        profile.daily_actions_remaining = 2
+        profile.save()
+
+        reset_daily_actions(profile)
         profile.refresh_from_db()
 
         self.assertEqual(profile.daily_actions_remaining, 20)

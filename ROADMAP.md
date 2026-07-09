@@ -184,7 +184,28 @@ Done when:
 * Notes persist.
 * Notes do not appear across other towns.
 
-## Phase 7: Inventory and Evidence
+## Phase 7: Admin and Operator Controls
+
+Goal: give trusted operators enough control to support playtesting without building a custom admin dashboard.
+
+Tasks:
+
+* Use Django staff/admin permissions as the first admin surface.
+* Add admin actions to reset a player's daily actions.
+* Add admin actions to reset a player's progress on a case.
+* Allow staff to hide or delete message board posts.
+* Make the rollover command easy for an admin/operator to run.
+* Show key player, town, case, clue, and board fields in Django admin.
+* Add audit-friendly timestamps or town events for meaningful admin actions where simple.
+* Add tests for permission boundaries around board deletion and reset helpers.
+
+Done when:
+
+* A staff admin can fix common playtest problems without touching the database manually.
+* Normal players cannot access admin controls.
+* Message board cleanup and player/case/action resets are covered by tests.
+
+## Phase 8: Inventory and Evidence
 
 Goal: give players a clear record of what they have.
 
@@ -201,7 +222,7 @@ Done when:
 
 * A player can understand what they know and what they are working on.
 
-## Phase 8: Portrait System
+## Phase 9: Portrait System
 
 Goal: support layered NPC portraits.
 
@@ -230,7 +251,7 @@ Done when:
 * NPCs can display stable layered portraits.
 * The same NPC looks the same on repeat visits.
 
-## Phase 9: Town Events and Logs
+## Phase 10: Town Events and Logs
 
 Goal: allow the town to remember public events.
 
@@ -247,7 +268,7 @@ Done when:
 
 * The town has a visible recent history.
 
-## Phase 10: Newspaper Prototype
+## Phase 11: Newspaper Prototype
 
 Goal: create a daily town summary.
 
@@ -265,7 +286,7 @@ Done when:
 
 * Players can read a daily newspaper that reflects some town activity.
 
-## Phase 11: Multiple Towns / Pods
+## Phase 12: Multiple Towns / Pods
 
 Goal: prepare for growth without changing the core design.
 
@@ -286,7 +307,7 @@ Done when:
 * New players can be assigned across towns automatically.
 * Town data does not leak between towns.
 
-## Phase 12: More Content
+## Phase 13: More Content
 
 Goal: make the town worth returning to.
 
@@ -314,7 +335,7 @@ Done when:
 
 * A player has multiple days of meaningful things to do.
 
-## Phase 13: Moderation and Safety
+## Phase 14: Moderation and Safety
 
 Goal: make public player text manageable.
 
@@ -332,7 +353,7 @@ Done when:
 
 * The game can safely support public notes from real players.
 
-## Phase 14: Polish
+## Phase 15: Polish
 
 Goal: improve the feel without changing the foundation.
 

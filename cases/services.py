@@ -91,6 +91,15 @@ def advance_case(player, case, location=None):
     return progress, clue
 
 
+def reset_case_progress(progress):
+    PlayerClue.objects.filter(player=progress.player, clue__case=progress.case).delete()
+    progress.status = PlayerCaseProgress.ACTIVE
+    progress.step = 0
+    progress.completed_at = None
+    progress.save(update_fields=["status", "step", "completed_at", "updated_at"])
+    return progress
+
+
 def case_cards_for_location(player, location):
     cases = list(player.town.cases.filter(is_active=True).select_related("starting_location"))
     progress_by_case = {

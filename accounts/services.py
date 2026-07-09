@@ -15,3 +15,9 @@ def ensure_player_profile(user):
         },
     )
     return profile
+
+
+def reset_daily_actions(profile):
+    profile.daily_actions_remaining = settings.DAILY_ACTION_ALLOWANCE
+    profile.save(update_fields=["daily_actions_remaining"])
+    return profile
