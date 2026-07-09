@@ -3,6 +3,7 @@
 {% block content %}
   <h1>{{ profile.town.name }}</h1>
   <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+  <p><a href="{% url 'newspaper' %}">Read today's paper</a></p>
 
   <h2>Locations</h2>
   <section class="grid">

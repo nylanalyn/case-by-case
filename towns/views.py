@@ -10,6 +10,7 @@ from cases.services import case_cards_for_location, case_cards_for_player
 from turns.services import NotEnoughActions
 
 from .models import Location, TownEvent
+from .newspaper import CLASSIFIEDS, WEIRD_NOTICES, current_rumor
 from .seed import ensure_initial_town
 
 
@@ -38,6 +39,25 @@ def town_history(request):
     profile = ensure_player_profile(request.user)
     events = TownEvent.objects.filter(town=profile.town)[:50]
     return render(request, "towns/history.html", {"profile": profile, "events": events})
+
+
+@login_required
+def newspaper(request):
+    profile = ensure_player_profile(request.user)
+    events = list(TownEvent.objects.filter(town=profile.town)[:20])
+    solved_cases = [event for event in events if " closed " in event.title]
+    return render(
+        request,
+        "towns/newspaper.html",
+        {
+            "profile": profile,
+            "events": events[:5],
+            "solved_cases": solved_cases[:5],
+            "rumor": current_rumor(events),
+            "classifieds": CLASSIFIEDS,
+            "weird_notices": WEIRD_NOTICES,
+        },
+    )
 
 
 @login_required
