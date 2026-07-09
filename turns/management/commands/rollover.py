@@ -4,6 +4,7 @@ from django.utils import timezone
 from accounts.models import PlayerProfile
 from accounts.services import reset_daily_actions
 from towns.models import Town, TownEvent
+from turns.rumors import rumor_for_date
 
 
 class Command(BaseCommand):
@@ -21,6 +22,6 @@ class Command(BaseCommand):
             TownEvent.objects.create(
                 town=town,
                 title="A new day settles over town",
-                body="Actions have refreshed. The coffee is still bad.",
+                body=f"Actions have refreshed. Rumor: {rumor_for_date(today)}",
             )
         self.stdout.write(self.style.SUCCESS(f"Restored actions for {updated} player(s)."))
