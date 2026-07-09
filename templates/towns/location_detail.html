@@ -45,6 +45,7 @@
   {% endfor %}
 
   <h2>Location board</h2>
+  <p>Leaving a note costs 1 action.</p>
   <form method="post" class="panel">
     {% csrf_token %}
     {{ form.as_p }}

@@ -84,3 +84,13 @@ class BoardTests(TestCase):
 
         self.assertEqual(MessageBoardPost.objects.filter(town=first_profile.town, location=first_diner).count(), 1)
         self.assertEqual(MessageBoardPost.objects.filter(town=second_profile.town, location=second_diner).count(), 0)
+
+    def test_location_board_displays_action_cost(self):
+        user = User.objects.create_user(username="mara", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        location = Location.objects.get(town=profile.town, slug="diner")
+
+        self.client.force_login(user)
+        response = self.client.get(f"/town/locations/{location.slug}/")
+
+        self.assertContains(response, "Leaving a note costs 1 action.")
