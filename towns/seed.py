@@ -1,3 +1,6 @@
+from django.db import models
+from django.utils.text import slugify
+
 from .models import Location, NPC, Town
 
 
@@ -36,6 +39,32 @@ def ensure_initial_town():
         town = Town.objects.create(slug="brindle-creek", name="Brindle Creek", capacity=100)
     ensure_town_content(town)
     return town
+
+
+def assign_town_for_new_player():
+    ensure_initial_town()
+    town = (
+        Town.objects.annotate(player_count=models.Count("players"))
+        .filter(player_count__lt=models.F("capacity"))
+        .order_by("created_at", "id")
+        .first()
+    )
+    if town is None:
+        town = create_town_pod()
+    ensure_town_content(town)
+    return town
+
+
+def create_town_pod():
+    next_number = Town.objects.count() + 1
+    while True:
+        name = f"Brindle Creek {next_number}"
+        slug = slugify(name)
+        if not Town.objects.filter(slug=slug).exists():
+            town = Town.objects.create(slug=slug, name=name, capacity=100)
+            ensure_town_content(town)
+            return town
+        next_number += 1
 
 
 def ensure_town_content(town):

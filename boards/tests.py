@@ -69,3 +69,18 @@ class BoardTests(TestCase):
 
         with self.assertRaises(BoardCooldownError):
             create_post(profile, location, "Forgot the bookmark.")
+
+    def test_board_posts_do_not_leak_between_town_pods(self):
+        first_user = User.objects.create_user(username="rumi", password="safe-password-123")
+        first_profile = ensure_player_profile(first_user)
+        first_profile.town.capacity = 1
+        first_profile.town.save()
+        second_user = User.objects.create_user(username="nico", password="safe-password-123")
+        second_profile = ensure_player_profile(second_user)
+
+        first_diner = Location.objects.get(town=first_profile.town, slug="diner")
+        second_diner = Location.objects.get(town=second_profile.town, slug="diner")
+        create_post(first_profile, first_diner, "Only the first town should see this.")
+
+        self.assertEqual(MessageBoardPost.objects.filter(town=first_profile.town, location=first_diner).count(), 1)
+        self.assertEqual(MessageBoardPost.objects.filter(town=second_profile.town, location=second_diner).count(), 0)

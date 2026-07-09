@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from accounts.services import ensure_player_profile
-from towns.models import Town
+from towns.models import Location, Town
 from towns.seed import ensure_initial_town
 
 
@@ -24,3 +24,16 @@ class AccountTests(TestCase):
         self.assertEqual(town.id, old_town.id)
         self.assertEqual(town.slug, "brindle-creek")
         self.assertEqual(town.name, "Brindle Creek")
+
+    def test_new_players_are_assigned_to_new_pod_when_town_is_full(self):
+        first_user = User.objects.create_user(username="mara", password="safe-password-123")
+        first_profile = ensure_player_profile(first_user)
+        first_profile.town.capacity = 1
+        first_profile.town.save()
+
+        second_user = User.objects.create_user(username="halden", password="safe-password-123")
+        second_profile = ensure_player_profile(second_user)
+
+        self.assertNotEqual(first_profile.town_id, second_profile.town_id)
+        self.assertEqual(second_profile.town.slug, "brindle-creek-2")
+        self.assertEqual(Location.objects.filter(town=second_profile.town).count(), 8)

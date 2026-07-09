@@ -1,18 +1,18 @@
 from django.conf import settings
 
-from towns.seed import ensure_initial_town
+from towns.seed import assign_town_for_new_player
 
 from .models import PlayerProfile
 
 
 def ensure_player_profile(user):
-    town = ensure_initial_town()
-    profile, _created = PlayerProfile.objects.get_or_create(
+    profile = PlayerProfile.objects.filter(user=user).first()
+    if profile is not None:
+        return profile
+    profile = PlayerProfile.objects.create(
         user=user,
-        defaults={
-            "town": town,
-            "daily_actions_remaining": settings.DAILY_ACTION_ALLOWANCE,
-        },
+        town=assign_town_for_new_player(),
+        daily_actions_remaining=settings.DAILY_ACTION_ALLOWANCE,
     )
     return profile
 
