@@ -2,10 +2,27 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from accounts.services import ensure_player_profile
+from cases.models import Case
+from cases.services import advance_case
+from towns.models import Location
 from towns.models import TownEvent
 
 
 class TownHistoryTests(TestCase):
+    def test_town_home_shows_current_leads(self):
+        user = User.objects.create_user(username="halden", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        diner = Location.objects.get(town=profile.town, slug="diner")
+        advance_case(profile, case, location=diner)
+
+        self.client.force_login(user)
+        response = self.client.get("/town/")
+
+        self.assertContains(response, "Current leads")
+        self.assertContains(response, "The Missing Ledger")
+        self.assertContains(response, "/town/locations/library/")
+
     def test_history_page_shows_town_events(self):
         user = User.objects.create_user(username="rumi", password="safe-password-123")
         profile = ensure_player_profile(user)

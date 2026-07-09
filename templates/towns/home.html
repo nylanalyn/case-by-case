@@ -5,6 +5,18 @@
   <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
   <p><a href="{% url 'newspaper' %}">Read today's paper</a></p>
 
+  <h2>Current leads</h2>
+  <section class="grid">
+    {% for card in current_leads %}
+      <article class="card">
+        <h3>{{ card.case.title }}</h3>
+        <p><a href="{% url 'location_detail' card.action.location_slug %}">{{ card.action.location_name }}</a></p>
+      </article>
+    {% empty %}
+      <p>No open leads.</p>
+    {% endfor %}
+  </section>
+
   <h2>Locations</h2>
   <section class="grid">
     {% for location in locations %}

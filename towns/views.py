@@ -27,10 +27,21 @@ def town_home(request):
     locations = Location.objects.filter(town=profile.town, is_unlocked=True)
     events = TownEvent.objects.filter(town=profile.town)[:5]
     case_cards = case_cards_for_player(profile)
+    current_leads = [
+        card
+        for card in case_cards
+        if card["is_available"] and card["status"] != "complete" and card["action"] is not None
+    ]
     return render(
         request,
         "towns/home.html",
-        {"profile": profile, "locations": locations, "events": events, "case_cards": case_cards},
+        {
+            "profile": profile,
+            "locations": locations,
+            "events": events,
+            "case_cards": case_cards,
+            "current_leads": current_leads,
+        },
     )
 
 
