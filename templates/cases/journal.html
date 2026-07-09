@@ -1,11 +1,37 @@
 {% extends "base.html" %}
-{% block title %}Clue Journal{% endblock %}
+{% block title %}Case Journal{% endblock %}
 {% block content %}
-  <h1>Clue Journal</h1>
+  <h1>Case Journal</h1>
   <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+
+  <h2>Cases</h2>
+  <section class="grid">
+    {% for record in case_records %}
+      <article class="card">
+        <h3><a href="{% url 'case_detail' record.case.id %}">{{ record.case.title }}</a></h3>
+        <p>{{ record.case.summary }}</p>
+        {% if record.status == "complete" %}
+          <p><strong>Closed.</strong> {{ record.case.outcome_text }}</p>
+        {% elif record.action %}
+          <p>Next lead: <a href="{% url 'location_detail' record.action.location_slug %}">{{ record.action.location_name }}</a></p>
+        {% endif %}
+
+        <h4>Evidence</h4>
+        {% for player_clue in record.clues %}
+          <p><strong>{{ player_clue.clue.title }}:</strong> {{ player_clue.clue.text }}</p>
+        {% empty %}
+          <p>No clues recorded for this case yet.</p>
+        {% endfor %}
+      </article>
+    {% empty %}
+      <p>No cases are available.</p>
+    {% endfor %}
+  </section>
+
+  <h2>All clues</h2>
   {% for player_clue in clues %}
     <article class="card">
-      <h2>{{ player_clue.clue.title }}</h2>
+      <h3>{{ player_clue.clue.title }}</h3>
       <p><strong>{{ player_clue.clue.case.title }}</strong></p>
       <p>{{ player_clue.clue.text }}</p>
     </article>

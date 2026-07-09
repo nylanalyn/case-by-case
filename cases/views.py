@@ -7,7 +7,7 @@ from towns.models import Location
 from turns.services import NotEnoughActions
 
 from .models import Case, PlayerClue
-from .services import WrongLocation, advance_case, available_case_action, case_cards_for_player, get_or_start_case
+from .services import WrongLocation, advance_case, available_case_action, case_cards_for_player, case_journal_for_player, get_or_start_case
 
 
 @login_required
@@ -56,5 +56,6 @@ def advance_case_view(request, case_id):
 @login_required
 def clue_journal(request):
     profile = ensure_player_profile(request.user)
+    case_records = case_journal_for_player(profile)
     clues = PlayerClue.objects.filter(player=profile).select_related("clue", "clue__case")
-    return render(request, "cases/journal.html", {"clues": clues, "profile": profile})
+    return render(request, "cases/journal.html", {"case_records": case_records, "clues": clues, "profile": profile})

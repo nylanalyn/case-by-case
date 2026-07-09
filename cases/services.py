@@ -127,6 +127,18 @@ def case_cards_for_player(player):
     return [case_card_for_player(player, case, progress_by_case.get(case.id)) for case in cases]
 
 
+def case_journal_for_player(player):
+    cards = case_cards_for_player(player)
+    clues = PlayerClue.objects.filter(player=player).select_related("clue", "clue__case")
+    clues_by_case_id = {}
+    for player_clue in clues:
+        clues_by_case_id.setdefault(player_clue.clue.case_id, []).append(player_clue)
+    records = []
+    for card in cards:
+        records.append({**card, "clues": clues_by_case_id.get(card["case"].id, [])})
+    return records
+
+
 def case_cards_for_location(player, location):
     cases = list(player.town.cases.filter(is_active=True).select_related("starting_location"))
     progress_by_case = {

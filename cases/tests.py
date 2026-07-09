@@ -3,7 +3,14 @@ from django.test import TestCase
 
 from accounts.services import ensure_player_profile
 from cases.models import Case, PlayerCaseProgress, PlayerClue
-from cases.services import WrongLocation, advance_case, case_cards_for_location, case_cards_for_player, reset_case_progress
+from cases.services import (
+    WrongLocation,
+    advance_case,
+    case_cards_for_location,
+    case_cards_for_player,
+    case_journal_for_player,
+    reset_case_progress,
+)
 from towns.models import Location, TownEvent
 
 
@@ -93,3 +100,31 @@ class CaseTests(TestCase):
 
         self.assertContains(response, "Next lead")
         self.assertContains(response, "/town/locations/diner/")
+
+    def test_case_journal_groups_evidence_by_case(self):
+        user = User.objects.create_user(username="june", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        diner = Location.objects.get(town=profile.town, slug="diner")
+
+        advance_case(profile, case, location=diner)
+
+        record = case_journal_for_player(profile)[0]
+        self.assertEqual(record["case"], case)
+        self.assertEqual(len(record["clues"]), 1)
+        self.assertEqual(record["action"]["location_slug"], "library")
+
+    def test_journal_page_shows_cases_and_evidence(self):
+        user = User.objects.create_user(username="nico", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        diner = Location.objects.get(town=profile.town, slug="diner")
+        advance_case(profile, case, location=diner)
+
+        self.client.force_login(user)
+        response = self.client.get("/cases/journal/")
+
+        self.assertContains(response, "Case Journal")
+        self.assertContains(response, "The Missing Ledger")
+        self.assertContains(response, "A note under the counter")
+        self.assertContains(response, "/town/locations/library/")

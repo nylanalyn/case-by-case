@@ -14,7 +14,7 @@
         {% if user.is_authenticated %}
           <a href="{% url 'town_home' %}">Town</a>
           <a href="{% url 'case_list' %}">Cases</a>
-          <a href="{% url 'clue_journal' %}">Clues</a>
+          <a href="{% url 'clue_journal' %}">Journal</a>
           <a href="{% url 'account' %}">Account</a>
           <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
