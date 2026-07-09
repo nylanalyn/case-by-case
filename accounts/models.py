@@ -8,6 +8,7 @@ class PlayerProfile(models.Model):
     town = models.ForeignKey("towns.Town", on_delete=models.PROTECT, related_name="players")
     daily_actions_remaining = models.PositiveSmallIntegerField(default=settings.DAILY_ACTION_ALLOWANCE)
     last_rollover_date = models.DateField(null=True, blank=True)
+    stats = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

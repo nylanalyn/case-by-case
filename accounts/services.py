@@ -21,3 +21,14 @@ def reset_daily_actions(profile):
     profile.daily_actions_remaining = settings.DAILY_ACTION_ALLOWANCE
     profile.save(update_fields=["daily_actions_remaining"])
     return profile
+
+
+def apply_stat_changes(profile, changes):
+    if not changes:
+        return profile
+    stats = dict(profile.stats or {})
+    for key, delta in changes.items():
+        stats[key] = stats.get(key, 0) + delta
+    profile.stats = stats
+    profile.save(update_fields=["stats"])
+    return profile

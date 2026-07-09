@@ -6,7 +6,7 @@ from .services import reset_daily_actions
 
 @admin.register(PlayerProfile)
 class PlayerProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "town", "daily_actions_remaining", "last_rollover_date")
+    list_display = ("user", "town", "daily_actions_remaining", "last_rollover_date", "stats")
     list_filter = ("town",)
     search_fields = ("user__username", "user__email")
     actions = ["reset_selected_daily_actions"]

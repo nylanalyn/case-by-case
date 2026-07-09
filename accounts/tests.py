@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from accounts.services import ensure_player_profile
+from accounts.services import apply_stat_changes, ensure_player_profile
 from cases.models import Case
 from towns.models import Location, Town
 from towns.seed import ensure_initial_town
@@ -39,3 +39,14 @@ class AccountTests(TestCase):
         self.assertEqual(second_profile.town.slug, "brindle-creek-2")
         self.assertEqual(Location.objects.filter(town=second_profile.town).count(), 8)
         self.assertEqual(Case.objects.filter(town=second_profile.town).count(), 2)
+
+    def test_apply_stat_changes_adds_and_updates_profile_stats(self):
+        user = User.objects.create_user(username="iris", password="safe-password-123")
+        profile = ensure_player_profile(user)
+
+        apply_stat_changes(profile, {"library_trust": 1, "nosy": 2})
+        apply_stat_changes(profile, {"library_trust": 2})
+        profile.refresh_from_db()
+
+        self.assertEqual(profile.stats["library_trust"], 3)
+        self.assertEqual(profile.stats["nosy"], 2)

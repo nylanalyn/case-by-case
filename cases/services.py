@@ -1,5 +1,6 @@
 from django.utils import timezone
 
+from accounts.services import apply_stat_changes
 from turns.services import spend_action
 from towns.models import TownEvent
 
@@ -77,6 +78,19 @@ CASE_STEPS = {
     ],
 }
 
+CASE_COMPLETION_EFFECTS = {
+    "The Missing Ledger": {
+        "town_favor": 1,
+        "sheriff_trust": 1,
+        "nosy": 1,
+    },
+    "The Cemetery Gate": {
+        "weirdness_tolerance": 1,
+        "cemetery_trust": 1,
+        "skeptical": -1,
+    },
+}
+
 
 class WrongLocation(Exception):
     pass
@@ -123,6 +137,7 @@ def advance_case(player, case, location=None):
     if action["action"] == "finish":
         progress.status = PlayerCaseProgress.COMPLETE
         progress.completed_at = timezone.now()
+        apply_stat_changes(player, CASE_COMPLETION_EFFECTS.get(case.title, {}))
         TownEvent.objects.create(
             town=player.town,
             title=f"{player.user.username} closed {case.title}",

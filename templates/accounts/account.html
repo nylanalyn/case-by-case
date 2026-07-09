@@ -6,5 +6,15 @@
     <p><strong>Username:</strong> {{ user.username }}</p>
     <p><strong>Town:</strong> {{ profile.town.name }}</p>
     <p><strong>Actions remaining:</strong> {{ profile.daily_actions_remaining }}</p>
+    <h2>Profile</h2>
+    {% if profile.stats %}
+      <ul>
+        {% for name, value in profile.stats.items %}
+          <li><strong>{{ name }}:</strong> {{ value }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No reputation has settled around you yet.</p>
+    {% endif %}
   </section>
 {% endblock %}

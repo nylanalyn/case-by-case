@@ -38,6 +38,8 @@ class CaseTests(TestCase):
         self.assertEqual(TownEvent.objects.filter(town=profile.town, title__contains=case.title).count(), 1)
         profile.refresh_from_db()
         self.assertEqual(profile.daily_actions_remaining, 16)
+        self.assertEqual(profile.stats["town_favor"], 1)
+        self.assertEqual(profile.stats["sheriff_trust"], 1)
 
     def test_case_step_requires_correct_location(self):
         user = User.objects.create_user(username="mara", password="safe-password-123")
@@ -113,6 +115,8 @@ class CaseTests(TestCase):
         self.assertEqual(PlayerClue.objects.filter(player=profile, clue__case=case).count(), 4)
         profile.refresh_from_db()
         self.assertEqual(profile.daily_actions_remaining, 16)
+        self.assertEqual(profile.stats["weirdness_tolerance"], 1)
+        self.assertEqual(profile.stats["cemetery_trust"], 1)
 
     def test_case_pages_show_next_lead_link(self):
         user = User.objects.create_user(username="mara", password="safe-password-123")
