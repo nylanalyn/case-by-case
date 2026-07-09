@@ -102,8 +102,9 @@ def ensure_cases(town, locations):
     for data in CASE_DEFINITIONS:
         case, _created = Case.objects.get_or_create(
             town=town,
-            title=data["title"],
+            slug=data["slug"],
             defaults={
+                "title": data["title"],
                 "summary": data["summary"],
                 "starting_location": locations[data["starting_location_slug"]],
                 "outcome_text": data["outcome_text"],

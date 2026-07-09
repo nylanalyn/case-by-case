@@ -1,5 +1,6 @@
 CASE_DEFINITIONS = [
     {
+        "slug": "missing-ledger",
         "title": "The Missing Ledger",
         "summary": "The diner ledger vanished overnight. Mara says it is just bookkeeping, but the last page was copied by hand.",
         "starting_location_slug": "diner",
@@ -52,6 +53,7 @@ CASE_DEFINITIONS = [
         ],
     },
     {
+        "slug": "cemetery-gate",
         "title": "The Cemetery Gate",
         "summary": "The cemetery's north gate keeps turning up wet, unlocked, and facing the wrong way by morning.",
         "starting_location_slug": "cemetery",
@@ -105,6 +107,7 @@ CASE_DEFINITIONS = [
         ],
     },
     {
+        "slug": "observatory-appointment",
         "title": "The Observatory Appointment",
         "summary": "An appointment appears on the observatory calendar every Thursday, signed by nobody and already crossed out.",
         "starting_location_slug": "observatory",
@@ -161,8 +164,8 @@ CASE_DEFINITIONS = [
     },
 ]
 
-CASE_DEFINITION_BY_TITLE = {definition["title"]: definition for definition in CASE_DEFINITIONS}
+CASE_DEFINITION_BY_SLUG = {definition["slug"]: definition for definition in CASE_DEFINITIONS}
 
 
-def case_definition_for_title(title):
-    return CASE_DEFINITION_BY_TITLE.get(title, {})
+def case_definition_for_slug(slug):
+    return CASE_DEFINITION_BY_SLUG.get(slug, {})

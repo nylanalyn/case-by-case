@@ -21,17 +21,22 @@ def card_for_title(cards, title):
 
 
 class CaseTests(TestCase):
+    def test_authored_case_definitions_have_unique_slugs(self):
+        slugs = [definition["slug"] for definition in CASE_DEFINITIONS]
+
+        self.assertEqual(len(slugs), len(set(slugs)))
+
     def test_authored_case_steps_reference_seeded_clues(self):
         for definition in CASE_DEFINITIONS:
             clue_codes = {clue[0] for clue in definition["clues"]}
             step_clues = {step["clue"] for step in definition["steps"]}
 
-            self.assertTrue(step_clues.issubset(clue_codes), definition["title"])
+            self.assertTrue(step_clues.issubset(clue_codes), definition["slug"])
 
     def test_starter_case_can_be_completed(self):
         user = User.objects.create_user(username="nico", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
         locations = [
             Location.objects.get(town=profile.town, slug="diner"),
             Location.objects.get(town=profile.town, slug="library"),
@@ -54,7 +59,7 @@ class CaseTests(TestCase):
     def test_case_step_requires_correct_location(self):
         user = User.objects.create_user(username="mara", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
         library = Location.objects.get(town=profile.town, slug="library")
 
         with self.assertRaises(WrongLocation):
@@ -63,7 +68,7 @@ class CaseTests(TestCase):
     def test_reset_case_progress_clears_case_clues(self):
         user = User.objects.create_user(username="iris", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
         diner = Location.objects.get(town=profile.town, slug="diner")
         progress, _clue = advance_case(profile, case, location=diner)
 
@@ -77,7 +82,7 @@ class CaseTests(TestCase):
     def test_completed_case_does_not_crash_location_cards(self):
         user = User.objects.create_user(username="rumi", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
         locations = [
             Location.objects.get(town=profile.town, slug="diner"),
             Location.objects.get(town=profile.town, slug="library"),
@@ -94,7 +99,7 @@ class CaseTests(TestCase):
     def test_case_cards_point_to_next_lead(self):
         user = User.objects.create_user(username="halden", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
 
         card = card_for_title(case_cards_for_player(profile), "The Missing Ledger")
         self.assertEqual(card["status"], PlayerCaseProgress.NOT_STARTED)
@@ -110,7 +115,7 @@ class CaseTests(TestCase):
     def test_second_case_has_its_own_route(self):
         user = User.objects.create_user(username="arlet", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Cemetery Gate", town=profile.town)
+        case = Case.objects.get(slug="cemetery-gate", town=profile.town)
         locations = [
             Location.objects.get(town=profile.town, slug="cemetery"),
             Location.objects.get(town=profile.town, slug="library"),
@@ -131,7 +136,7 @@ class CaseTests(TestCase):
     def test_stat_gated_case_unlocks_after_required_stat(self):
         user = User.objects.create_user(username="vale", password="safe-password-123")
         profile = ensure_player_profile(user)
-        observatory_case = Case.objects.get(title="The Observatory Appointment", town=profile.town)
+        observatory_case = Case.objects.get(slug="observatory-appointment", town=profile.town)
         observatory = Location.objects.get(town=profile.town, slug="observatory")
 
         card = card_for_title(case_cards_for_player(profile), "The Observatory Appointment")
@@ -140,7 +145,7 @@ class CaseTests(TestCase):
         with self.assertRaises(CaseLocked):
             advance_case(profile, observatory_case, location=observatory)
 
-        cemetery_case = Case.objects.get(title="The Cemetery Gate", town=profile.town)
+        cemetery_case = Case.objects.get(slug="cemetery-gate", town=profile.town)
         cemetery_route = [
             Location.objects.get(town=profile.town, slug="cemetery"),
             Location.objects.get(town=profile.town, slug="library"),
@@ -168,7 +173,7 @@ class CaseTests(TestCase):
     def test_location_case_card_links_to_next_lead_after_action(self):
         user = User.objects.create_user(username="mara", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
         diner = Location.objects.get(town=profile.town, slug="diner")
         advance_case(profile, case, location=diner)
 
@@ -181,7 +186,7 @@ class CaseTests(TestCase):
     def test_case_journal_groups_evidence_by_case(self):
         user = User.objects.create_user(username="june", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
         diner = Location.objects.get(town=profile.town, slug="diner")
 
         advance_case(profile, case, location=diner)
@@ -194,7 +199,7 @@ class CaseTests(TestCase):
     def test_journal_page_shows_cases_and_evidence(self):
         user = User.objects.create_user(username="nico", password="safe-password-123")
         profile = ensure_player_profile(user)
-        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        case = Case.objects.get(slug="missing-ledger", town=profile.town)
         diner = Location.objects.get(town=profile.town, slug="diner")
         advance_case(profile, case, location=diner)
 

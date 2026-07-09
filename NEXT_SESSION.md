@@ -26,6 +26,10 @@ Longer term, procedural or generated content should probably be used for filler/
 
 The case data was centralized in `cases/definitions.py` so adding authored cases is cheaper and less error-prone.
 
+Cases are now keyed by a stable `slug` (unique per town), not by title. Every definition in `cases/definitions.py` must include a `slug`, and all definition lookups go through `case_definition_for_slug`. Titles are display-only and may clash — this is deliberate, since future generated cases will collide on names by luck. Migration `cases/0002_case_slug` backfilled existing rows.
+
+Two security fixes also landed: startup now fails loudly if `DEBUG` is off without a real `SECRET_KEY`, and board posts no longer copy their content into public `TownEvent` bodies (so hiding/deleting a note actually removes it from history/newspaper, and players can't inject fake "Rumor:" lines).
+
 ## Design Intent
 
 Keep the town persistent, grounded, odd, and local.
@@ -60,4 +64,4 @@ python manage.py runserver
 
 ## Last Known Good Tests
 
-Full suite passed with 32 tests after centralizing authored case definitions.
+Full suite passed with 34 tests after moving cases to slug-based identity.

@@ -168,8 +168,13 @@ Example:
 
 Cases are structured investigations.
 
+Each case is identified by a stable slug, not its title. Titles are
+display text and are allowed to clash; slugs are unique within a town and
+tie a case to its authored definition.
+
 A case may include:
 
+* slug
 * title
 * summary
 * starting location

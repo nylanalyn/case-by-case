@@ -5,7 +5,7 @@ from accounts.stats import stat_label
 from turns.services import spend_action
 from towns.models import TownEvent
 
-from .definitions import case_definition_for_title
+from .definitions import case_definition_for_slug
 from .models import Clue, PlayerCaseProgress, PlayerClue
 
 
@@ -18,11 +18,11 @@ class CaseLocked(Exception):
 
 
 def steps_for_case(case):
-    return case_definition_for_title(case.title).get("steps", [])
+    return case_definition_for_slug(case.slug).get("steps", [])
 
 
 def unmet_case_requirements(player, case):
-    requirements = case_definition_for_title(case.title).get("requirements", {})
+    requirements = case_definition_for_slug(case.slug).get("requirements", {})
     stats = player.stats or {}
     unmet = {}
     for stat, minimum in requirements.items():
@@ -76,7 +76,7 @@ def advance_case(player, case, location=None):
     if action["action"] == "finish":
         progress.status = PlayerCaseProgress.COMPLETE
         progress.completed_at = timezone.now()
-        apply_stat_changes(player, case_definition_for_title(case.title).get("completion_effects", {}))
+        apply_stat_changes(player, case_definition_for_slug(case.slug).get("completion_effects", {}))
         TownEvent.objects.create(
             town=player.town,
             title=f"{player.user.username} closed {case.title}",

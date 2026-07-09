@@ -117,9 +117,15 @@ The same NPC should look the same every time unless changed intentionally.
 
 Cases should be data-friendly but not overengineered.
 
+Every case has a stable `slug` that is its identity. The slug links database
+rows to their authored definition in `cases/definitions.py` and is unique per
+town. Titles are display-only and may clash (especially once generated cases
+exist) — never look up a case or its definition by title.
+
 A case should support:
 
-* title
+* slug (stable identity, unique per town)
+* title (display only)
 * description
 * starting location
 * progress state

@@ -2,6 +2,9 @@ from django.db import models
 
 
 class Case(models.Model):
+    # Stable key linking this row to its authored definition in
+    # cases/definitions.py. Titles are display-only and may clash.
+    slug = models.SlugField(max_length=80)
     title = models.CharField(max_length=120)
     summary = models.TextField()
     town = models.ForeignKey("towns.Town", on_delete=models.CASCADE, related_name="cases")
@@ -10,6 +13,7 @@ class Case(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        unique_together = ("town", "slug")
         ordering = ["title"]
 
     def __str__(self):

@@ -11,8 +11,9 @@ class ClueInline(admin.TabularInline):
 
 @admin.register(Case)
 class CaseAdmin(admin.ModelAdmin):
-    list_display = ("title", "town", "starting_location", "is_active")
+    list_display = ("slug", "title", "town", "starting_location", "is_active")
     list_filter = ("town", "is_active")
+    search_fields = ("slug", "title")
     inlines = [ClueInline]
 
 
