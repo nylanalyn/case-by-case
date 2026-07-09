@@ -6,19 +6,15 @@ from accounts.services import ensure_player_profile
 from towns.models import Location
 from turns.services import NotEnoughActions
 
-from .models import Case, PlayerCaseProgress, PlayerClue
-from .services import WrongLocation, advance_case, available_case_action, get_or_start_case
+from .models import Case, PlayerClue
+from .services import WrongLocation, advance_case, available_case_action, case_cards_for_player, get_or_start_case
 
 
 @login_required
 def case_list(request):
     profile = ensure_player_profile(request.user)
-    cases = Case.objects.filter(town=profile.town, is_active=True)
-    progress_by_case = {
-        progress.case_id: progress
-        for progress in PlayerCaseProgress.objects.filter(player=profile, case__in=cases)
-    }
-    return render(request, "cases/list.html", {"cases": cases, "progress_by_case": progress_by_case, "profile": profile})
+    case_cards = case_cards_for_player(profile)
+    return render(request, "cases/list.html", {"case_cards": case_cards, "profile": profile})
 
 
 @login_required

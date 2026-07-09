@@ -16,10 +16,15 @@
 
   <h2>Cases</h2>
   <section class="grid">
-    {% for case in active_cases %}
+    {% for card in case_cards %}
       <article class="card">
-        <h3><a href="{% url 'case_detail' case.id %}">{{ case.title }}</a></h3>
-        <p>{{ case.summary }}</p>
+        <h3><a href="{% url 'case_detail' card.case.id %}">{{ card.case.title }}</a></h3>
+        <p>{{ card.case.summary }}</p>
+        {% if card.status == "complete" %}
+          <p><strong>Closed.</strong></p>
+        {% elif card.action %}
+          <p>Next lead: <a href="{% url 'location_detail' card.action.location_slug %}">{{ card.action.location_name }}</a></p>
+        {% endif %}
       </article>
     {% empty %}
       <p>No active cases.</p>

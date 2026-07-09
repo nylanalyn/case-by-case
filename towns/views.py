@@ -6,8 +6,7 @@ from accounts.services import ensure_player_profile
 from boards.forms import MessageBoardPostForm
 from boards.models import MessageBoardPost
 from boards.services import BoardCooldownError, create_post
-from cases.models import Case
-from cases.services import case_cards_for_location
+from cases.services import case_cards_for_location, case_cards_for_player
 from turns.services import NotEnoughActions
 
 from .models import Location, TownEvent
@@ -26,11 +25,11 @@ def town_home(request):
     profile = ensure_player_profile(request.user)
     locations = Location.objects.filter(town=profile.town, is_unlocked=True)
     events = TownEvent.objects.filter(town=profile.town)[:5]
-    active_cases = Case.objects.filter(town=profile.town, is_active=True)
+    case_cards = case_cards_for_player(profile)
     return render(
         request,
         "towns/home.html",
-        {"profile": profile, "locations": locations, "events": events, "active_cases": active_cases},
+        {"profile": profile, "locations": locations, "events": events, "case_cards": case_cards},
     )
 
 

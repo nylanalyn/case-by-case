@@ -9,7 +9,7 @@
     {% if progress.status == "complete" %}
       <p><strong>Closed:</strong> {{ case.outcome_text }}</p>
     {% elif action %}
-      <p>Next lead: {{ action.location_name }}</p>
+      <p>Next lead: <a href="{% url 'location_detail' action.location_slug %}">{{ action.location_name }}</a></p>
     {% endif %}
   </section>
 

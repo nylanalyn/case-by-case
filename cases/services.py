@@ -64,7 +64,7 @@ def available_case_action(progress):
 
 
 def action_matches_location(action, location):
-    return location is not None and action["location_slug"] == location.slug
+    return action is not None and location is not None and action["location_slug"] == location.slug
 
 
 def advance_case(player, case, location=None):
@@ -100,6 +100,33 @@ def reset_case_progress(progress):
     return progress
 
 
+def case_card_for_player(player, case, progress=None):
+    if progress is None:
+        progress = PlayerCaseProgress.objects.filter(player=player, case=case).first()
+    if progress is None:
+        return {
+            "case": case,
+            "progress": None,
+            "status": PlayerCaseProgress.NOT_STARTED,
+            "action": STARTER_STEPS[0],
+        }
+    return {
+        "case": case,
+        "progress": progress,
+        "status": progress.status,
+        "action": available_case_action(progress),
+    }
+
+
+def case_cards_for_player(player):
+    cases = list(player.town.cases.filter(is_active=True).select_related("starting_location"))
+    progress_by_case = {
+        progress.case_id: progress
+        for progress in PlayerCaseProgress.objects.filter(player=player, case__in=cases)
+    }
+    return [case_card_for_player(player, case, progress_by_case.get(case.id)) for case in cases]
+
+
 def case_cards_for_location(player, location):
     cases = list(player.town.cases.filter(is_active=True).select_related("starting_location"))
     progress_by_case = {
@@ -112,8 +139,10 @@ def case_cards_for_location(player, location):
         if progress is None and case.starting_location_id != location.id:
             continue
         if progress is None:
-            progress = PlayerCaseProgress(player=player, case=case, status=PlayerCaseProgress.ACTIVE, step=0)
-        action = available_case_action(progress)
+            card = case_card_for_player(player, case)
+            action = card["action"]
+        else:
+            action = available_case_action(progress)
         if case.starting_location_id == location.id or action_matches_location(action, location):
             cards.append({"case": case, "progress": progress, "action": action})
     return cards
