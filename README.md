@@ -1,6 +1,6 @@
-# Deep Archive
+# Case by Case
 
-A small Django prototype for a daily-turn mystery game set in a persistent town.
+A small Django prototype for a daily-turn mystery game set in the persistent town of Brindle Creek.
 
 ## Local setup
 

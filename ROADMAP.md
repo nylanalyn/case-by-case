@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-# Development Roadmap
+# Case by Case Development Roadmap
 
 This roadmap is intentionally staged. The goal is to build a playable foundation first, then expand the town outward.
 

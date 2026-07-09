@@ -22,10 +22,23 @@ NPC_DATA = [
 
 
 def ensure_initial_town():
-    town, _created = Town.objects.get_or_create(
-        slug="deep-archive",
-        defaults={"name": "Deep Archive", "capacity": 100},
-    )
+    town = Town.objects.filter(slug="brindle-creek").first()
+    old_town = Town.objects.filter(slug="deep-archive").first()
+    if town is None and old_town is not None:
+        old_town.slug = "brindle-creek"
+        old_town.name = "Brindle Creek"
+        old_town.save(update_fields=["slug", "name"])
+        town = old_town
+    elif town is not None and town.name != "Brindle Creek":
+        town.name = "Brindle Creek"
+        town.save(update_fields=["name"])
+    if town is None:
+        town = Town.objects.create(slug="brindle-creek", name="Brindle Creek", capacity=100)
+    ensure_town_content(town)
+    return town
+
+
+def ensure_town_content(town):
     locations = {}
     for index, (slug, name, description) in enumerate(LOCATION_DATA):
         location, _created = Location.objects.get_or_create(
@@ -51,7 +64,6 @@ def ensure_initial_town():
             },
         )
     ensure_starter_case(town, locations)
-    return town
 
 
 def ensure_starter_case(town, locations):

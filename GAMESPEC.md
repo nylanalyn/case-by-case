@@ -1,8 +1,8 @@
 # GAMESPEC.md
 
-# Project Overview
+# Case by Case Project Overview
 
-This is a web-based daily-turn mystery game set in a persistent small town.
+Case by Case is a web-based daily-turn mystery game set in Brindle Creek, a persistent small town.
 
 Players create an account, enter a town, spend a limited number of daily actions investigating cases, talking to NPCs, collecting clues, reading local messages, and slowly uncovering strange events.
 
