@@ -38,7 +38,7 @@ class AccountTests(TestCase):
         self.assertNotEqual(first_profile.town_id, second_profile.town_id)
         self.assertEqual(second_profile.town.slug, "brindle-creek-2")
         self.assertEqual(Location.objects.filter(town=second_profile.town).count(), 8)
-        self.assertEqual(Case.objects.filter(town=second_profile.town).count(), 2)
+        self.assertEqual(Case.objects.filter(town=second_profile.town).count(), 3)
 
     def test_apply_stat_changes_adds_and_updates_profile_stats(self):
         user = User.objects.create_user(username="iris", password="safe-password-123")

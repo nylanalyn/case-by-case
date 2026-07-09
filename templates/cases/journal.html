@@ -10,7 +10,9 @@
       <article class="card">
         <h3><a href="{% url 'case_detail' record.case.id %}">{{ record.case.title }}</a></h3>
         <p>{{ record.case.summary }}</p>
-        {% if record.status == "complete" %}
+        {% if not record.is_available %}
+          <p><strong>Locked.</strong> Needed: {{ record.requirements }}</p>
+        {% elif record.status == "complete" %}
           <p><strong>Closed.</strong> {{ record.case.outcome_text }}</p>
         {% elif record.action %}
           <p>Next lead: <a href="{% url 'location_detail' record.action.location_slug %}">{{ record.action.location_name }}</a></p>

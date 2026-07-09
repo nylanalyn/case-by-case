@@ -21,7 +21,9 @@
       <article class="card">
         <h3><a href="{% url 'case_detail' card.case.id %}">{{ card.case.title }}</a></h3>
         <p>{{ card.case.summary }}</p>
-        {% if card.status == "complete" %}
+        {% if not card.is_available %}
+          <p><strong>Locked.</strong> Needed: {{ card.requirements }}</p>
+        {% elif card.status == "complete" %}
           <p><strong>Closed.</strong></p>
         {% elif card.action %}
           <p>Next lead: <a href="{% url 'location_detail' card.action.location_slug %}">{{ card.action.location_name }}</a></p>

@@ -76,6 +76,46 @@ CASE_STEPS = {
             "next_step": 4,
         },
     ],
+    "The Observatory Appointment": [
+        {
+            "action": "start",
+            "label": "Ask about the missed appointment",
+            "location_slug": "observatory",
+            "location_name": "Observatory",
+            "clue": "missed-appointment",
+            "next_step": 1,
+        },
+        {
+            "action": "library",
+            "label": "Read the old star chart",
+            "location_slug": "library",
+            "location_name": "Library",
+            "clue": "wrong-star-chart",
+            "next_step": 2,
+        },
+        {
+            "action": "river",
+            "label": "Follow the reflected light",
+            "location_slug": "river-walk",
+            "location_name": "River Walk",
+            "clue": "river-reflection",
+            "next_step": 3,
+        },
+        {
+            "action": "finish",
+            "label": "Close the observatory appointment",
+            "location_slug": "observatory",
+            "location_name": "Observatory",
+            "clue": "empty-calendar",
+            "next_step": 4,
+        },
+    ],
+}
+
+CASE_STAT_REQUIREMENTS = {
+    "The Observatory Appointment": {
+        "weirdness_tolerance": 1,
+    },
 }
 
 CASE_COMPLETION_EFFECTS = {
@@ -89,6 +129,11 @@ CASE_COMPLETION_EFFECTS = {
         "cemetery_trust": 1,
         "skeptical": -1,
     },
+    "The Observatory Appointment": {
+        "weirdness_tolerance": 1,
+        "observatory_trust": 1,
+        "town_favor": -1,
+    },
 }
 
 
@@ -96,11 +141,31 @@ class WrongLocation(Exception):
     pass
 
 
+class CaseLocked(Exception):
+    pass
+
+
 def steps_for_case(case):
     return CASE_STEPS.get(case.title, [])
 
 
+def unmet_case_requirements(player, case):
+    requirements = CASE_STAT_REQUIREMENTS.get(case.title, {})
+    stats = player.stats or {}
+    unmet = {}
+    for stat, minimum in requirements.items():
+        if stats.get(stat, 0) < minimum:
+            unmet[stat] = minimum
+    return unmet
+
+
+def format_requirements(requirements):
+    return ", ".join(f"{stat} {minimum}+" for stat, minimum in requirements.items())
+
+
 def get_or_start_case(player, case):
+    if unmet_case_requirements(player, case):
+        raise CaseLocked(f"This case is not open to you yet. Needed: {format_requirements(unmet_case_requirements(player, case))}.")
     progress, _created = PlayerCaseProgress.objects.get_or_create(
         player=player,
         case=case,
@@ -123,7 +188,9 @@ def action_matches_location(action, location):
 
 
 def advance_case(player, case, location=None):
-    progress = get_or_start_case(player, case)
+    progress = PlayerCaseProgress.objects.filter(player=player, case=case).first()
+    if progress is None:
+        progress = get_or_start_case(player, case)
     action = available_case_action(progress)
     if action is None:
         return progress, None
@@ -159,19 +226,24 @@ def reset_case_progress(progress):
 def case_card_for_player(player, case, progress=None):
     if progress is None:
         progress = PlayerCaseProgress.objects.filter(player=player, case=case).first()
+    requirements = unmet_case_requirements(player, case) if progress is None else {}
     if progress is None:
         steps = steps_for_case(case)
         return {
             "case": case,
             "progress": None,
             "status": PlayerCaseProgress.NOT_STARTED,
-            "action": steps[0] if steps else None,
+            "action": None if requirements else steps[0] if steps else None,
+            "is_available": not requirements,
+            "requirements": format_requirements(requirements),
         }
     return {
         "case": case,
         "progress": progress,
         "status": progress.status,
         "action": available_case_action(progress),
+        "is_available": True,
+        "requirements": "",
     }
 
 
@@ -213,5 +285,5 @@ def case_cards_for_location(player, location):
         else:
             action = available_case_action(progress)
         if case.starting_location_id == location.id or action_matches_location(action, location):
-            cards.append({"case": case, "progress": progress, "action": action})
+            cards.append({**case_card_for_player(player, case, progress), "action": action})
     return cards

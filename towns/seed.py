@@ -123,6 +123,18 @@ def ensure_cases(town, locations):
                 ("cleaned-hinge", "A cleaned hinge", "The hinge was scrubbed with river water and a strip of diner towel.", 4),
             ],
         },
+        {
+            "title": "The Observatory Appointment",
+            "summary": "An appointment appears on the observatory calendar every Thursday, signed by nobody and already crossed out.",
+            "starting_location": locations["observatory"],
+            "outcome_text": "The appointment was copied from a star chart margin, not scheduled by a person. The telescope was aimed at the river anyway.",
+            "clues": [
+                ("missed-appointment", "A missed appointment", "The calendar entry is written in pencil that leaves no dust when rubbed.", 1),
+                ("wrong-star-chart", "The wrong star chart", "The library chart marks a Thursday that never happened in the town records.", 2),
+                ("river-reflection", "A river reflection", "The observatory dome appears in the river reflection even when the hill is behind you.", 3),
+                ("empty-calendar", "An empty calendar square", "The appointment vanishes after the telescope is turned away from the water.", 4),
+            ],
+        },
     ]
     for data in case_data:
         case, _created = Case.objects.get_or_create(

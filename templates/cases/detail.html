@@ -6,7 +6,9 @@
   <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
   <section class="panel">
     <p>{{ case.summary }}</p>
-    {% if progress.status == "complete" %}
+    {% if not card.is_available %}
+      <p><strong>Locked.</strong> Needed: {{ card.requirements }}</p>
+    {% elif progress.status == "complete" %}
       <p><strong>Closed:</strong> {{ case.outcome_text }}</p>
     {% elif action %}
       <p>Next lead: <a href="{% url 'location_detail' action.location_slug %}">{{ action.location_name }}</a></p>

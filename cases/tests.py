@@ -4,6 +4,7 @@ from django.test import TestCase
 from accounts.services import ensure_player_profile
 from cases.models import Case, PlayerCaseProgress, PlayerClue
 from cases.services import (
+    CaseLocked,
     WrongLocation,
     advance_case,
     case_cards_for_location,
@@ -117,6 +118,33 @@ class CaseTests(TestCase):
         self.assertEqual(profile.daily_actions_remaining, 16)
         self.assertEqual(profile.stats["weirdness_tolerance"], 1)
         self.assertEqual(profile.stats["cemetery_trust"], 1)
+
+    def test_stat_gated_case_unlocks_after_required_stat(self):
+        user = User.objects.create_user(username="vale", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        observatory_case = Case.objects.get(title="The Observatory Appointment", town=profile.town)
+        observatory = Location.objects.get(town=profile.town, slug="observatory")
+
+        card = card_for_title(case_cards_for_player(profile), "The Observatory Appointment")
+        self.assertFalse(card["is_available"])
+        self.assertEqual(card["requirements"], "weirdness_tolerance 1+")
+        with self.assertRaises(CaseLocked):
+            advance_case(profile, observatory_case, location=observatory)
+
+        cemetery_case = Case.objects.get(title="The Cemetery Gate", town=profile.town)
+        cemetery_route = [
+            Location.objects.get(town=profile.town, slug="cemetery"),
+            Location.objects.get(town=profile.town, slug="library"),
+            Location.objects.get(town=profile.town, slug="bus-depot"),
+            Location.objects.get(town=profile.town, slug="cemetery"),
+        ]
+        for location in cemetery_route:
+            advance_case(profile, cemetery_case, location=location)
+        profile.refresh_from_db()
+
+        card = card_for_title(case_cards_for_player(profile), "The Observatory Appointment")
+        self.assertTrue(card["is_available"])
+        self.assertEqual(card["action"]["location_slug"], "observatory")
 
     def test_case_pages_show_next_lead_link(self):
         user = User.objects.create_user(username="mara", password="safe-password-123")

@@ -26,7 +26,9 @@
     <article class="card">
       <h3><a href="{% url 'case_detail' card.case.id %}">{{ card.case.title }}</a></h3>
       <p>{{ card.case.summary }}</p>
-      {% if card.progress.status == "complete" %}
+      {% if not card.is_available %}
+        <p><strong>Locked.</strong> Needed: {{ card.requirements }}</p>
+      {% elif card.progress.status == "complete" %}
         <p><strong>Closed:</strong> {{ card.case.outcome_text }}</p>
       {% elif card.action and card.action.location_slug == location.slug %}
         <form method="post" action="{% url 'advance_case' card.case.id %}">
