@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Deep Archive{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'site.css' %}">
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="{% url 'home' %}"><strong>Deep Archive</strong></a>
+      <nav class="nav">
+        {% if user.is_authenticated %}
+          <a href="{% url 'town_home' %}">Town</a>
+          <a href="{% url 'case_list' %}">Cases</a>
+          <a href="{% url 'clue_journal' %}">Clues</a>
+          <a href="{% url 'account' %}">Account</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Log in</a>
+          <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+      </nav>
+    </header>
+    <main class="container">
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

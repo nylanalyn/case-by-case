@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ location.name }}{% endblock %}
+{% block content %}
+  <p><a href="{% url 'town_home' %}">Back to town</a></p>
+  <h1>{{ location.name }}</h1>
+  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+  <section class="panel">
+    <p>{{ location.description }}</p>
+  </section>
+
+  <h2>People here</h2>
+  <section class="grid">
+    {% for npc in location.npcs.all %}
+      <article class="card">
+        <h3>{{ npc.name }}</h3>
+        <p><strong>{{ npc.role }}</strong></p>
+        <p>{{ npc.dialogue }}</p>
+      </article>
+    {% empty %}
+      <p>No one is lingering here.</p>
+    {% endfor %}
+  </section>
+
+  <h2>Cases here</h2>
+  {% for card in case_cards %}
+    <article class="card">
+      <h3><a href="{% url 'case_detail' card.case.id %}">{{ card.case.title }}</a></h3>
+      <p>{{ card.case.summary }}</p>
+      {% if card.progress.status == "complete" %}
+        <p><strong>Closed:</strong> {{ card.case.outcome_text }}</p>
+      {% elif card.action and card.action.location_slug == location.slug %}
+        <form method="post" action="{% url 'advance_case' card.case.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="location_slug" value="{{ location.slug }}">
+          <button type="submit" {% if profile.daily_actions_remaining == 0 %}disabled{% endif %}>{{ card.action.label }}</button>
+        </form>
+      {% elif card.action %}
+        <p>Next lead: {{ card.action.location_name }}</p>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p>No cases begin here today.</p>
+  {% endfor %}
+
+  <h2>Location board</h2>
+  <form method="post" class="panel">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" {% if profile.daily_actions_remaining == 0 %}disabled{% endif %}>Leave a note</button>
+  </form>
+  {% for post in posts %}
+    <article class="card">
+      <p>{{ post.content }}</p>
+      <small>{{ post.player.user.username }} pinned this on {{ post.created_at }}</small>
+      {% if post.player_id == profile.id %}
+        <form method="post" action="{% url 'delete_board_post' post.id %}">
+          {% csrf_token %}
+          <button type="submit">Remove note</button>
+        </form>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p>No notes yet.</p>
+  {% endfor %}
+{% endblock %}

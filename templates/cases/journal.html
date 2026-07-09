@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Clue Journal{% endblock %}
+{% block content %}
+  <h1>Clue Journal</h1>
+  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+  {% for player_clue in clues %}
+    <article class="card">
+      <h2>{{ player_clue.clue.title }}</h2>
+      <p><strong>{{ player_clue.clue.case.title }}</strong></p>
+      <p>{{ player_clue.clue.text }}</p>
+    </article>
+  {% empty %}
+    <p>Your notebook is blank.</p>
+  {% endfor %}
+{% endblock %}

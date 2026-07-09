@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Cases{% endblock %}
+{% block content %}
+  <h1>Cases</h1>
+  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+  <section class="grid">
+    {% for case in cases %}
+      <article class="card">
+        <h2><a href="{% url 'case_detail' case.id %}">{{ case.title }}</a></h2>
+        <p>{{ case.summary }}</p>
+      </article>
+    {% endfor %}
+  </section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ case.title }}{% endblock %}
+{% block content %}
+  <p><a href="{% url 'case_list' %}">Back to cases</a></p>
+  <h1>{{ case.title }}</h1>
+  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+  <section class="panel">
+    <p>{{ case.summary }}</p>
+    {% if progress.status == "complete" %}
+      <p><strong>Closed:</strong> {{ case.outcome_text }}</p>
+    {% elif action %}
+      <p>Next lead: {{ action.location_name }}</p>
+    {% endif %}
+  </section>
+
+  <h2>Collected clues</h2>
+  {% for player_clue in clues %}
+    <article class="card">
+      <h3>{{ player_clue.clue.title }}</h3>
+      <p>{{ player_clue.clue.text }}</p>
+    </article>
+  {% empty %}
+    <p>You have not collected clues for this case yet.</p>
+  {% endfor %}
+{% endblock %}

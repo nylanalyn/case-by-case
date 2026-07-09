@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.town.name }}{% endblock %}
+{% block content %}
+  <h1>{{ profile.town.name }}</h1>
+  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+
+  <h2>Locations</h2>
+  <section class="grid">
+    {% for location in locations %}
+      <article class="card">
+        <h3><a href="{% url 'location_detail' location.slug %}">{{ location.name }}</a></h3>
+        <p>{{ location.description }}</p>
+      </article>
+    {% endfor %}
+  </section>
+
+  <h2>Cases</h2>
+  <section class="grid">
+    {% for case in active_cases %}
+      <article class="card">
+        <h3><a href="{% url 'case_detail' case.id %}">{{ case.title }}</a></h3>
+        <p>{{ case.summary }}</p>
+      </article>
+    {% empty %}
+      <p>No active cases.</p>
+    {% endfor %}
+  </section>
+
+  <h2>Recent town events</h2>
+  {% for event in events %}
+    <article class="card">
+      <strong>{{ event.title }}</strong>
+      <p>{{ event.body }}</p>
+    </article>
+  {% empty %}
+    <p>The town is quiet for now.</p>
+  {% endfor %}
+{% endblock %}
