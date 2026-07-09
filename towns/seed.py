@@ -92,30 +92,51 @@ def ensure_town_content(town):
                 "personality_tags": "grounded, observant",
             },
         )
-    ensure_starter_case(town, locations)
+    ensure_cases(town, locations)
 
 
-def ensure_starter_case(town, locations):
+def ensure_cases(town, locations):
     from cases.models import Case, Clue
 
-    case, _created = Case.objects.get_or_create(
-        town=town,
-        title="The Missing Ledger",
-        defaults={
+    case_data = [
+        {
+            "title": "The Missing Ledger",
             "summary": "The diner ledger vanished overnight. Mara says it is just bookkeeping, but the last page was copied by hand.",
             "starting_location": locations["diner"],
             "outcome_text": "The ledger was hidden to cover a petty cash scheme. The receipt from River Walk does not fit the story.",
+            "clues": [
+                ("counter-note", "A note under the counter", "Mara found a damp note where the ledger should have been.", 1),
+                ("library-card", "A misfiled library card", "The ledger's borrower line matches an old library account that should be closed.", 2),
+                ("sheriff-copy", "A copied ledger page", "The sheriff's office has a copy with one line scratched out too neatly.", 3),
+                ("river-receipt", "A river-stained receipt", "The receipt proves the ledger was near River Walk after midnight.", 4),
+            ],
         },
-    )
-    clues = [
-        ("counter-note", "A note under the counter", "Mara found a damp note where the ledger should have been.", 1),
-        ("library-card", "A misfiled library card", "The ledger's borrower line matches an old library account that should be closed.", 2),
-        ("sheriff-copy", "A copied ledger page", "The sheriff's office has a copy with one line scratched out too neatly.", 3),
-        ("river-receipt", "A river-stained receipt", "The receipt proves the ledger was near River Walk after midnight.", 4),
+        {
+            "title": "The Cemetery Gate",
+            "summary": "The cemetery's north gate keeps turning up wet, unlocked, and facing the wrong way by morning.",
+            "starting_location": locations["cemetery"],
+            "outcome_text": "June was hiding a late-night shortcut for the bus depot clerk. The hinge was cleaned with river water, for reasons nobody explains.",
+            "clues": [
+                ("wet-lock", "A wet lock", "The north gate lock is damp inside, though the rest of the iron is dry.", 1),
+                ("north-row-map", "The north row map", "An old library map shows a service path from the cemetery toward the depot.", 2),
+                ("folded-ticket", "A folded bus ticket", "The ticket is punched after midnight and tucked into the wrong schedule slot.", 3),
+                ("cleaned-hinge", "A cleaned hinge", "The hinge was scrubbed with river water and a strip of diner towel.", 4),
+            ],
+        },
     ]
-    for code, title, text, order in clues:
-        Clue.objects.get_or_create(
-            case=case,
-            code=code,
-            defaults={"title": title, "text": text, "sort_order": order},
+    for data in case_data:
+        case, _created = Case.objects.get_or_create(
+            town=town,
+            title=data["title"],
+            defaults={
+                "summary": data["summary"],
+                "starting_location": data["starting_location"],
+                "outcome_text": data["outcome_text"],
+            },
         )
+        for code, title, text, order in data["clues"]:
+            Clue.objects.get_or_create(
+                case=case,
+                code=code,
+                defaults={"title": title, "text": text, "sort_order": order},
+            )

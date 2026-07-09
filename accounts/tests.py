@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from accounts.services import ensure_player_profile
+from cases.models import Case
 from towns.models import Location, Town
 from towns.seed import ensure_initial_town
 
@@ -37,3 +38,4 @@ class AccountTests(TestCase):
         self.assertNotEqual(first_profile.town_id, second_profile.town_id)
         self.assertEqual(second_profile.town.slug, "brindle-creek-2")
         self.assertEqual(Location.objects.filter(town=second_profile.town).count(), 8)
+        self.assertEqual(Case.objects.filter(town=second_profile.town).count(), 2)

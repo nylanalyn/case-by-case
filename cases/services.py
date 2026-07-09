@@ -6,44 +6,84 @@ from towns.models import TownEvent
 from .models import Clue, PlayerCaseProgress, PlayerClue
 
 
-STARTER_STEPS = [
-    {
-        "action": "start",
-        "label": "Ask about the missing ledger",
-        "location_slug": "diner",
-        "location_name": "Diner",
-        "clue": "counter-note",
-        "next_step": 1,
-    },
-    {
-        "action": "library",
-        "label": "Check the library records",
-        "location_slug": "library",
-        "location_name": "Library",
-        "clue": "library-card",
-        "next_step": 2,
-    },
-    {
-        "action": "sheriff",
-        "label": "Compare notes at the sheriff's office",
-        "location_slug": "sheriffs-office",
-        "location_name": "Sheriff's Office",
-        "clue": "sheriff-copy",
-        "next_step": 3,
-    },
-    {
-        "action": "finish",
-        "label": "Close the ledger case",
-        "location_slug": "river-walk",
-        "location_name": "River Walk",
-        "clue": "river-receipt",
-        "next_step": 4,
-    },
-]
+CASE_STEPS = {
+    "The Missing Ledger": [
+        {
+            "action": "start",
+            "label": "Ask about the missing ledger",
+            "location_slug": "diner",
+            "location_name": "Diner",
+            "clue": "counter-note",
+            "next_step": 1,
+        },
+        {
+            "action": "library",
+            "label": "Check the library records",
+            "location_slug": "library",
+            "location_name": "Library",
+            "clue": "library-card",
+            "next_step": 2,
+        },
+        {
+            "action": "sheriff",
+            "label": "Compare notes at the sheriff's office",
+            "location_slug": "sheriffs-office",
+            "location_name": "Sheriff's Office",
+            "clue": "sheriff-copy",
+            "next_step": 3,
+        },
+        {
+            "action": "finish",
+            "label": "Close the ledger case",
+            "location_slug": "river-walk",
+            "location_name": "River Walk",
+            "clue": "river-receipt",
+            "next_step": 4,
+        },
+    ],
+    "The Cemetery Gate": [
+        {
+            "action": "start",
+            "label": "Ask June about the wet gate",
+            "location_slug": "cemetery",
+            "location_name": "Cemetery",
+            "clue": "wet-lock",
+            "next_step": 1,
+        },
+        {
+            "action": "library",
+            "label": "Compare the old burial map",
+            "location_slug": "library",
+            "location_name": "Library",
+            "clue": "north-row-map",
+            "next_step": 2,
+        },
+        {
+            "action": "depot",
+            "label": "Check the late bus schedule",
+            "location_slug": "bus-depot",
+            "location_name": "Bus Depot",
+            "clue": "folded-ticket",
+            "next_step": 3,
+        },
+        {
+            "action": "finish",
+            "label": "Close the cemetery gate case",
+            "location_slug": "cemetery",
+            "location_name": "Cemetery",
+            "clue": "cleaned-hinge",
+            "next_step": 4,
+        },
+    ],
+}
 
 
 class WrongLocation(Exception):
     pass
+
+
+def steps_for_case(case):
+    return CASE_STEPS.get(case.title, [])
 
 
 def get_or_start_case(player, case):
@@ -56,11 +96,12 @@ def get_or_start_case(player, case):
 
 
 def available_case_action(progress):
+    steps = steps_for_case(progress.case)
     if progress.status == PlayerCaseProgress.COMPLETE:
         return None
-    if progress.step >= len(STARTER_STEPS):
+    if progress.step >= len(steps):
         return None
-    return STARTER_STEPS[progress.step]
+    return steps[progress.step]
 
 
 def action_matches_location(action, location):
@@ -104,11 +145,12 @@ def case_card_for_player(player, case, progress=None):
     if progress is None:
         progress = PlayerCaseProgress.objects.filter(player=player, case=case).first()
     if progress is None:
+        steps = steps_for_case(case)
         return {
             "case": case,
             "progress": None,
             "status": PlayerCaseProgress.NOT_STARTED,
-            "action": STARTER_STEPS[0],
+            "action": steps[0] if steps else None,
         }
     return {
         "case": case,
