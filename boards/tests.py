@@ -4,7 +4,7 @@ from django.test import TestCase
 from accounts.services import ensure_player_profile
 from boards.models import MessageBoardPost
 from boards.services import BoardCooldownError, create_post
-from towns.models import Location
+from towns.models import Location, TownEvent
 
 
 class BoardTests(TestCase):
@@ -16,6 +16,7 @@ class BoardTests(TestCase):
         create_post(profile, location, "The pie case is empty again.")
 
         self.assertEqual(MessageBoardPost.objects.filter(town=profile.town, location=location).count(), 1)
+        self.assertEqual(TownEvent.objects.filter(town=profile.town, title__contains="left a note").count(), 1)
         profile.refresh_from_db()
         self.assertEqual(profile.daily_actions_remaining, 19)
 

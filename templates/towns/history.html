@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.town.name }} History{% endblock %}
+{% block content %}
+  <p><a href="{% url 'town_home' %}">Back to town</a></p>
+  <h1>{{ profile.town.name }} History</h1>
+  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
+
+  {% for event in events %}
+    <article class="card">
+      <h2>{{ event.title }}</h2>
+      {% if event.body %}
+        <p>{{ event.body }}</p>
+      {% endif %}
+      <small>{{ event.created_at }}</small>
+    </article>
+  {% empty %}
+    <p>The town has not written anything down yet.</p>
+  {% endfor %}
+{% endblock %}

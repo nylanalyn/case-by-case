@@ -34,6 +34,13 @@ def town_home(request):
 
 
 @login_required
+def town_history(request):
+    profile = ensure_player_profile(request.user)
+    events = TownEvent.objects.filter(town=profile.town)[:50]
+    return render(request, "towns/history.html", {"profile": profile, "events": events})
+
+
+@login_required
 def location_detail(request, slug):
     profile = ensure_player_profile(request.user)
     location = get_object_or_404(Location, town=profile.town, slug=slug, is_unlocked=True)

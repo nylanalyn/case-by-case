@@ -32,6 +32,7 @@
   </section>
 
   <h2>Recent town events</h2>
+  <p><a href="{% url 'town_history' %}">View full history</a></p>
   {% for event in events %}
     <article class="card">
       <strong>{{ event.title }}</strong>

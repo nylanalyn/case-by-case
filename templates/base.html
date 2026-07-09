@@ -13,6 +13,7 @@
       <nav class="nav">
         {% if user.is_authenticated %}
           <a href="{% url 'town_home' %}">Town</a>
+          <a href="{% url 'town_history' %}">History</a>
           <a href="{% url 'case_list' %}">Cases</a>
           <a href="{% url 'clue_journal' %}">Journal</a>
           <a href="{% url 'account' %}">Account</a>
