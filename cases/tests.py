@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from accounts.services import ensure_player_profile
+from cases.definitions import CASE_DEFINITIONS
 from cases.models import Case, PlayerCaseProgress, PlayerClue
 from cases.services import (
     CaseLocked,
@@ -20,6 +21,13 @@ def card_for_title(cards, title):
 
 
 class CaseTests(TestCase):
+    def test_authored_case_steps_reference_seeded_clues(self):
+        for definition in CASE_DEFINITIONS:
+            clue_codes = {clue[0] for clue in definition["clues"]}
+            step_clues = {step["clue"] for step in definition["steps"]}
+
+            self.assertTrue(step_clues.issubset(clue_codes), definition["title"])
+
     def test_starter_case_can_be_completed(self):
         user = User.objects.create_user(username="nico", password="safe-password-123")
         profile = ensure_player_profile(user)

@@ -96,53 +96,16 @@ def ensure_town_content(town):
 
 
 def ensure_cases(town, locations):
+    from cases.definitions import CASE_DEFINITIONS
     from cases.models import Case, Clue
 
-    case_data = [
-        {
-            "title": "The Missing Ledger",
-            "summary": "The diner ledger vanished overnight. Mara says it is just bookkeeping, but the last page was copied by hand.",
-            "starting_location": locations["diner"],
-            "outcome_text": "The ledger was hidden to cover a petty cash scheme. The receipt from River Walk does not fit the story.",
-            "clues": [
-                ("counter-note", "A note under the counter", "Mara found a damp note where the ledger should have been.", 1),
-                ("library-card", "A misfiled library card", "The ledger's borrower line matches an old library account that should be closed.", 2),
-                ("sheriff-copy", "A copied ledger page", "The sheriff's office has a copy with one line scratched out too neatly.", 3),
-                ("river-receipt", "A river-stained receipt", "The receipt proves the ledger was near River Walk after midnight.", 4),
-            ],
-        },
-        {
-            "title": "The Cemetery Gate",
-            "summary": "The cemetery's north gate keeps turning up wet, unlocked, and facing the wrong way by morning.",
-            "starting_location": locations["cemetery"],
-            "outcome_text": "June was hiding a late-night shortcut for the bus depot clerk. The hinge was cleaned with river water, for reasons nobody explains.",
-            "clues": [
-                ("wet-lock", "A wet lock", "The north gate lock is damp inside, though the rest of the iron is dry.", 1),
-                ("north-row-map", "The north row map", "An old library map shows a service path from the cemetery toward the depot.", 2),
-                ("folded-ticket", "A folded bus ticket", "The ticket is punched after midnight and tucked into the wrong schedule slot.", 3),
-                ("cleaned-hinge", "A cleaned hinge", "The hinge was scrubbed with river water and a strip of diner towel.", 4),
-            ],
-        },
-        {
-            "title": "The Observatory Appointment",
-            "summary": "An appointment appears on the observatory calendar every Thursday, signed by nobody and already crossed out.",
-            "starting_location": locations["observatory"],
-            "outcome_text": "The appointment was copied from a star chart margin, not scheduled by a person. The telescope was aimed at the river anyway.",
-            "clues": [
-                ("missed-appointment", "A missed appointment", "The calendar entry is written in pencil that leaves no dust when rubbed.", 1),
-                ("wrong-star-chart", "The wrong star chart", "The library chart marks a Thursday that never happened in the town records.", 2),
-                ("river-reflection", "A river reflection", "The observatory dome appears in the river reflection even when the hill is behind you.", 3),
-                ("empty-calendar", "An empty calendar square", "The appointment vanishes after the telescope is turned away from the water.", 4),
-            ],
-        },
-    ]
-    for data in case_data:
+    for data in CASE_DEFINITIONS:
         case, _created = Case.objects.get_or_create(
             town=town,
             title=data["title"],
             defaults={
                 "summary": data["summary"],
-                "starting_location": data["starting_location"],
+                "starting_location": locations[data["starting_location_slug"]],
                 "outcome_text": data["outcome_text"],
             },
         )

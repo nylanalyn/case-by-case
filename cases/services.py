@@ -5,139 +5,8 @@ from accounts.stats import stat_label
 from turns.services import spend_action
 from towns.models import TownEvent
 
+from .definitions import case_definition_for_title
 from .models import Clue, PlayerCaseProgress, PlayerClue
-
-
-CASE_STEPS = {
-    "The Missing Ledger": [
-        {
-            "action": "start",
-            "label": "Ask about the missing ledger",
-            "location_slug": "diner",
-            "location_name": "Diner",
-            "clue": "counter-note",
-            "next_step": 1,
-        },
-        {
-            "action": "library",
-            "label": "Check the library records",
-            "location_slug": "library",
-            "location_name": "Library",
-            "clue": "library-card",
-            "next_step": 2,
-        },
-        {
-            "action": "sheriff",
-            "label": "Compare notes at the sheriff's office",
-            "location_slug": "sheriffs-office",
-            "location_name": "Sheriff's Office",
-            "clue": "sheriff-copy",
-            "next_step": 3,
-        },
-        {
-            "action": "finish",
-            "label": "Close the ledger case",
-            "location_slug": "river-walk",
-            "location_name": "River Walk",
-            "clue": "river-receipt",
-            "next_step": 4,
-        },
-    ],
-    "The Cemetery Gate": [
-        {
-            "action": "start",
-            "label": "Ask June about the wet gate",
-            "location_slug": "cemetery",
-            "location_name": "Cemetery",
-            "clue": "wet-lock",
-            "next_step": 1,
-        },
-        {
-            "action": "library",
-            "label": "Compare the old burial map",
-            "location_slug": "library",
-            "location_name": "Library",
-            "clue": "north-row-map",
-            "next_step": 2,
-        },
-        {
-            "action": "depot",
-            "label": "Check the late bus schedule",
-            "location_slug": "bus-depot",
-            "location_name": "Bus Depot",
-            "clue": "folded-ticket",
-            "next_step": 3,
-        },
-        {
-            "action": "finish",
-            "label": "Close the cemetery gate case",
-            "location_slug": "cemetery",
-            "location_name": "Cemetery",
-            "clue": "cleaned-hinge",
-            "next_step": 4,
-        },
-    ],
-    "The Observatory Appointment": [
-        {
-            "action": "start",
-            "label": "Ask about the missed appointment",
-            "location_slug": "observatory",
-            "location_name": "Observatory",
-            "clue": "missed-appointment",
-            "next_step": 1,
-        },
-        {
-            "action": "library",
-            "label": "Read the old star chart",
-            "location_slug": "library",
-            "location_name": "Library",
-            "clue": "wrong-star-chart",
-            "next_step": 2,
-        },
-        {
-            "action": "river",
-            "label": "Follow the reflected light",
-            "location_slug": "river-walk",
-            "location_name": "River Walk",
-            "clue": "river-reflection",
-            "next_step": 3,
-        },
-        {
-            "action": "finish",
-            "label": "Close the observatory appointment",
-            "location_slug": "observatory",
-            "location_name": "Observatory",
-            "clue": "empty-calendar",
-            "next_step": 4,
-        },
-    ],
-}
-
-CASE_STAT_REQUIREMENTS = {
-    "The Observatory Appointment": {
-        "weirdness_tolerance": 1,
-    },
-}
-
-CASE_COMPLETION_EFFECTS = {
-    "The Missing Ledger": {
-        "town_trust": 1,
-        "diner_trust": 1,
-        "sheriff_trust": 1,
-    },
-    "The Cemetery Gate": {
-        "weirdness_tolerance": 1,
-        "cemetery_trust": 1,
-        "bus_depot_trust": 1,
-        "skeptical": -1,
-    },
-    "The Observatory Appointment": {
-        "weirdness_tolerance": 1,
-        "observatory_trust": 1,
-        "river_trust": 1,
-        "town_trust": -1,
-    },
-}
 
 
 class WrongLocation(Exception):
@@ -149,11 +18,11 @@ class CaseLocked(Exception):
 
 
 def steps_for_case(case):
-    return CASE_STEPS.get(case.title, [])
+    return case_definition_for_title(case.title).get("steps", [])
 
 
 def unmet_case_requirements(player, case):
-    requirements = CASE_STAT_REQUIREMENTS.get(case.title, {})
+    requirements = case_definition_for_title(case.title).get("requirements", {})
     stats = player.stats or {}
     unmet = {}
     for stat, minimum in requirements.items():
@@ -207,7 +76,7 @@ def advance_case(player, case, location=None):
     if action["action"] == "finish":
         progress.status = PlayerCaseProgress.COMPLETE
         progress.completed_at = timezone.now()
-        apply_stat_changes(player, CASE_COMPLETION_EFFECTS.get(case.title, {}))
+        apply_stat_changes(player, case_definition_for_title(case.title).get("completion_effects", {}))
         TownEvent.objects.create(
             town=player.town,
             title=f"{player.user.username} closed {case.title}",
