@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from accounts.services import apply_stat_changes, ensure_player_profile
+from accounts.stats import display_stats
 from cases.models import Case
 from towns.models import Location, Town
 from towns.seed import ensure_initial_town
@@ -44,9 +45,38 @@ class AccountTests(TestCase):
         user = User.objects.create_user(username="iris", password="safe-password-123")
         profile = ensure_player_profile(user)
 
-        apply_stat_changes(profile, {"library_trust": 1, "nosy": 2})
+        apply_stat_changes(profile, {"library_trust": 1, "town_trust": 2})
         apply_stat_changes(profile, {"library_trust": 2})
         profile.refresh_from_db()
 
         self.assertEqual(profile.stats["library_trust"], 3)
-        self.assertEqual(profile.stats["nosy"], 2)
+        self.assertEqual(profile.stats["town_trust"], 2)
+
+    def test_unknown_stats_are_rejected(self):
+        user = User.objects.create_user(username="nico", password="safe-password-123")
+        profile = ensure_player_profile(user)
+
+        with self.assertRaises(ValueError):
+            apply_stat_changes(profile, {"anything_goes": 1})
+
+    def test_stats_have_clean_display_labels(self):
+        stats = display_stats({"library_trust": 2, "weirdness_tolerance": 1})
+
+        self.assertEqual(
+            stats,
+            [
+                {"key": "library_trust", "label": "Library Trust", "value": 2},
+                {"key": "weirdness_tolerance", "label": "Weirdness Tolerance", "value": 1},
+            ],
+        )
+
+    def test_account_page_uses_clean_stat_labels(self):
+        user = User.objects.create_user(username="june", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        apply_stat_changes(profile, {"library_trust": 2})
+
+        self.client.force_login(user)
+        response = self.client.get("/accounts/account/")
+
+        self.assertContains(response, "Library Trust")
+        self.assertNotContains(response, "library_trust")

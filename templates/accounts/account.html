@@ -7,10 +7,10 @@
     <p><strong>Town:</strong> {{ profile.town.name }}</p>
     <p><strong>Actions remaining:</strong> {{ profile.daily_actions_remaining }}</p>
     <h2>Profile</h2>
-    {% if profile.stats %}
+    {% if display_stats %}
       <ul>
-        {% for name, value in profile.stats.items %}
-          <li><strong>{{ name }}:</strong> {{ value }}</li>
+        {% for stat in display_stats %}
+          <li><strong>{{ stat.label }}:</strong> {{ stat.value }}</li>
         {% endfor %}
       </ul>
     {% else %}

@@ -3,6 +3,7 @@ from django.conf import settings
 from towns.seed import assign_town_for_new_player
 
 from .models import PlayerProfile
+from .stats import STAT_DEFINITIONS
 
 
 def ensure_player_profile(user):
@@ -28,6 +29,8 @@ def apply_stat_changes(profile, changes):
         return profile
     stats = dict(profile.stats or {})
     for key, delta in changes.items():
+        if key not in STAT_DEFINITIONS:
+            raise ValueError(f"Unknown player stat: {key}")
         stats[key] = stats.get(key, 0) + delta
     profile.stats = stats
     profile.save(update_fields=["stats"])

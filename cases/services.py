@@ -1,6 +1,7 @@
 from django.utils import timezone
 
 from accounts.services import apply_stat_changes
+from accounts.stats import stat_label
 from turns.services import spend_action
 from towns.models import TownEvent
 
@@ -120,19 +121,21 @@ CASE_STAT_REQUIREMENTS = {
 
 CASE_COMPLETION_EFFECTS = {
     "The Missing Ledger": {
-        "town_favor": 1,
+        "town_trust": 1,
+        "diner_trust": 1,
         "sheriff_trust": 1,
-        "nosy": 1,
     },
     "The Cemetery Gate": {
         "weirdness_tolerance": 1,
         "cemetery_trust": 1,
+        "bus_depot_trust": 1,
         "skeptical": -1,
     },
     "The Observatory Appointment": {
         "weirdness_tolerance": 1,
         "observatory_trust": 1,
-        "town_favor": -1,
+        "river_trust": 1,
+        "town_trust": -1,
     },
 }
 
@@ -160,7 +163,7 @@ def unmet_case_requirements(player, case):
 
 
 def format_requirements(requirements):
-    return ", ".join(f"{stat} {minimum}+" for stat, minimum in requirements.items())
+    return ", ".join(f"{stat_label(stat)} {minimum}+" for stat, minimum in requirements.items())
 
 
 def get_or_start_case(player, case):

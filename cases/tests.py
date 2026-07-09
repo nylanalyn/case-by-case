@@ -39,7 +39,8 @@ class CaseTests(TestCase):
         self.assertEqual(TownEvent.objects.filter(town=profile.town, title__contains=case.title).count(), 1)
         profile.refresh_from_db()
         self.assertEqual(profile.daily_actions_remaining, 16)
-        self.assertEqual(profile.stats["town_favor"], 1)
+        self.assertEqual(profile.stats["town_trust"], 1)
+        self.assertEqual(profile.stats["diner_trust"], 1)
         self.assertEqual(profile.stats["sheriff_trust"], 1)
 
     def test_case_step_requires_correct_location(self):
@@ -127,7 +128,7 @@ class CaseTests(TestCase):
 
         card = card_for_title(case_cards_for_player(profile), "The Observatory Appointment")
         self.assertFalse(card["is_available"])
-        self.assertEqual(card["requirements"], "weirdness_tolerance 1+")
+        self.assertEqual(card["requirements"], "Weirdness Tolerance 1+")
         with self.assertRaises(CaseLocked):
             advance_case(profile, observatory_case, location=observatory)
 

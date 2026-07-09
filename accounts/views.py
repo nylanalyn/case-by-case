@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 
 from .forms import RegistrationForm
 from .services import ensure_player_profile
+from .stats import display_stats
 
 
 def register(request):
@@ -39,4 +40,4 @@ login_view = ProfileCreatingLoginView.as_view()
 @login_required
 def account(request):
     profile = ensure_player_profile(request.user)
-    return render(request, "accounts/account.html", {"profile": profile})
+    return render(request, "accounts/account.html", {"profile": profile, "display_stats": display_stats(profile.stats)})
