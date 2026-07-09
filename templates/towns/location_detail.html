@@ -37,7 +37,7 @@
           <button type="submit" {% if profile.daily_actions_remaining == 0 %}disabled{% endif %}>{{ card.action.label }}</button>
         </form>
       {% elif card.action %}
-        <p>Next lead: {{ card.action.location_name }}</p>
+        <p>Next lead: <a href="{% url 'location_detail' card.action.location_slug %}">{{ card.action.location_name }}</a></p>
       {% endif %}
     </article>
   {% empty %}

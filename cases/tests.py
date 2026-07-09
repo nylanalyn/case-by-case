@@ -157,6 +157,19 @@ class CaseTests(TestCase):
         self.assertContains(response, "Next lead")
         self.assertContains(response, "/town/locations/diner/")
 
+    def test_location_case_card_links_to_next_lead_after_action(self):
+        user = User.objects.create_user(username="mara", password="safe-password-123")
+        profile = ensure_player_profile(user)
+        case = Case.objects.get(title="The Missing Ledger", town=profile.town)
+        diner = Location.objects.get(town=profile.town, slug="diner")
+        advance_case(profile, case, location=diner)
+
+        self.client.force_login(user)
+        response = self.client.get("/town/locations/diner/")
+
+        self.assertContains(response, "Next lead")
+        self.assertContains(response, "/town/locations/library/")
+
     def test_case_journal_groups_evidence_by_case(self):
         user = User.objects.create_user(username="june", password="safe-password-123")
         profile = ensure_player_profile(user)
