@@ -1,0 +1,75 @@
+CASE_DEFINITION = {
+    "slug": "missing-ledger",
+    "title": "The Missing Ledger",
+    "summary": "The diner ledger vanished overnight. Mara says it is just bookkeeping, but the last page was copied by hand.",
+    "starting_location_slug": "diner",
+    "outcome_text": "The ledger was hidden to cover a petty cash scheme. The receipt from River Walk does not fit the story.",
+    "requirements": {},
+    "completion_effects": {
+        "town_trust": 1,
+        "diner_trust": 1,
+        "sheriff_trust": 1,
+    },
+    "steps": [
+        {
+            "action": "start",
+            "label": "Ask about the missing ledger",
+            "location_slug": "diner",
+            "location_name": "Diner",
+            "clue": "counter-note",
+            "next_step": 1,
+        },
+        {
+            "action": "library",
+            "label": "Check the library records",
+            "location_slug": "library",
+            "location_name": "Library",
+            "clue": "library-card",
+            "next_step": 2,
+        },
+        {
+            "action": "sheriff",
+            "label": "Compare notes at the sheriff's office",
+            "location_slug": "sheriffs-office",
+            "location_name": "Sheriff's Office",
+            "clue": "sheriff-copy",
+            "next_step": 3,
+        },
+        {
+            "action": "finish",
+            "label": "Decide what to do with the receipt",
+            "location_slug": "river-walk",
+            "location_name": "River Walk",
+            "clue": "river-receipt",
+            "next_step": 4,
+            "completion_choices": [
+                {
+                    "key": "report-the-scheme",
+                    "label": "Bring the receipt to Deputy Halden",
+                    "outcome_text": "Halden opens a quiet investigation into the petty cash scheme. Mara keeps serving bad coffee, but she stops asking who saw the ledger first.",
+                    "completion_effects": {
+                        "town_trust": 1,
+                        "diner_trust": 1,
+                        "sheriff_trust": 1,
+                    },
+                },
+                {
+                    "key": "leave-it-with-mara",
+                    "label": "Leave the receipt with Mara",
+                    "outcome_text": "Mara settles the missing cash before anyone files a report. The diner closes the books early for a week, and the river receipt is never mentioned again.",
+                    "completion_effects": {
+                        "diner_trust": 2,
+                        "town_trust": -1,
+                        "sheriff_trust": -1,
+                    },
+                },
+            ],
+        },
+    ],
+    "clues": [
+        ("counter-note", "A note under the counter", "Mara found a damp note where the ledger should have been.", 1),
+        ("library-card", "A misfiled library card", "The ledger's borrower line matches an old library account that should be closed.", 2),
+        ("sheriff-copy", "A copied ledger page", "The sheriff's office has a copy with one line scratched out too neatly.", 3),
+        ("river-receipt", "A river-stained receipt", "The receipt proves the ledger was near River Walk after midnight.", 4),
+    ],
+}

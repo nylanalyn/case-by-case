@@ -23,6 +23,19 @@ python manage.py rollover
 python manage.py validate_case_definitions
 ```
 
+## Authoring cases
+
+Each authored case lives in its own module under `cases/authored/` and exports a
+single `CASE_DEFINITION` dictionary. Keep its `slug` stable: it is the canonical
+identity used by saved player progress, while titles are display-only.
+
+After creating a case module, explicitly import its definition in
+`cases/authored/__init__.py` and add it to `CASE_DEFINITIONS` in the intended
+display/seed order. `cases/definitions.py` remains the public interface for the
+application; do not add filesystem discovery or direct callers of case modules.
+
+Run `python manage.py validate_case_definitions` before seeding or deploying.
+
 ## Time-gated case steps
 
 Each action normally remains available all day. To limit an authored case step,

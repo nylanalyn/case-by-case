@@ -1,0 +1,10 @@
+from .cemetery_gate import CASE_DEFINITION as CEMETERY_GATE
+from .missing_ledger import CASE_DEFINITION as MISSING_LEDGER
+from .observatory_appointment import CASE_DEFINITION as OBSERVATORY_APPOINTMENT
+
+
+CASE_DEFINITIONS = [
+    MISSING_LEDGER,
+    CEMETERY_GATE,
+    OBSERVATORY_APPOINTMENT,
+]

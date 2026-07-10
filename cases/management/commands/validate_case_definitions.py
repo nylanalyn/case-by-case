@@ -5,7 +5,7 @@ from cases.validation import validate_case_definitions
 
 
 class Command(BaseCommand):
-    help = "Validate authored cases in cases/definitions.py."
+    help = "Validate all explicitly imported authored case definitions."
 
     def handle(self, *args, **options):
         errors = validate_case_definitions(CASE_DEFINITIONS)

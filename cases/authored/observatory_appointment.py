@@ -1,0 +1,57 @@
+CASE_DEFINITION = {
+    "slug": "observatory-appointment",
+    "title": "The Observatory Appointment",
+    "summary": "An appointment appears on the observatory calendar every Thursday, signed by nobody and already crossed out.",
+    "starting_location_slug": "observatory",
+    "outcome_text": "The appointment was copied from a star chart margin, not scheduled by a person. The telescope was aimed at the river anyway.",
+    "requirements": {
+        "weirdness_tolerance": 1,
+    },
+    "lock_text": "Iris will not put the observatory appointment in your hands until you have seen Brindle Creek be stranger than a scheduling error.",
+    "completion_effects": {
+        "weirdness_tolerance": 1,
+        "observatory_trust": 1,
+        "river_trust": 1,
+        "town_trust": -1,
+    },
+    "steps": [
+        {
+            "action": "start",
+            "label": "Ask about the missed appointment",
+            "location_slug": "observatory",
+            "location_name": "Observatory",
+            "clue": "missed-appointment",
+            "next_step": 1,
+        },
+        {
+            "action": "library",
+            "label": "Read the old star chart",
+            "location_slug": "library",
+            "location_name": "Library",
+            "clue": "wrong-star-chart",
+            "next_step": 2,
+        },
+        {
+            "action": "river",
+            "label": "Follow the reflected light",
+            "location_slug": "river-walk",
+            "location_name": "River Walk",
+            "clue": "river-reflection",
+            "next_step": 3,
+        },
+        {
+            "action": "finish",
+            "label": "Close the observatory appointment",
+            "location_slug": "observatory",
+            "location_name": "Observatory",
+            "clue": "empty-calendar",
+            "next_step": 4,
+        },
+    ],
+    "clues": [
+        ("missed-appointment", "A missed appointment", "The calendar entry is written in pencil that leaves no dust when rubbed.", 1),
+        ("wrong-star-chart", "The wrong star chart", "The library chart marks a Thursday that never happened in the town records.", 2),
+        ("river-reflection", "A river reflection", "The observatory dome appears in the river reflection even when the hill is behind you.", 3),
+        ("empty-calendar", "An empty calendar square", "The appointment vanishes after the telescope is turned away from the water.", 4),
+    ],
+}

@@ -24,7 +24,9 @@ We decided main cases should stay authored for quality and tone.
 
 Longer term, procedural or generated content should probably be used for filler/micro-cases, rumors, flavor, and side mysteries, not as the core source of major cases until the authored case loop is strong.
 
-The case data was centralized in `cases/definitions.py` so adding authored cases is cheaper and less error-prone.
+Authored case data lives one case per module in `cases/authored/`. Add each new
+module to the explicit ordered imports in `cases/authored/__init__.py`;
+`cases/definitions.py` remains the stable public interface for the application.
 
 Cases are now keyed by a stable `slug` (unique per town), not by title. Every definition in `cases/definitions.py` must include a `slug`, and all definition lookups go through `case_definition_for_slug`. Titles are display-only and may clash — this is deliberate, since future generated cases will collide on names by luck. Migration `cases/0002_case_slug` backfilled existing rows.
 
@@ -47,7 +49,8 @@ Future bad or mixed endings can lower trust or shift stats.
 
 ## Recommended Next Steps
 
-1. Add one more authored case using `cases/definitions.py` to prove the new structure is pleasant.
+1. Add one more authored case in `cases/authored/` and register it in
+   `cases/authored/__init__.py` to prove the new structure is pleasant.
 2. Consider adding simple branching endings for one existing case, with different stat effects.
 3. Improve locked-case UI if it feels too mechanical.
 4. Add a light “case authoring checklist” to docs once the next case confirms the pattern.

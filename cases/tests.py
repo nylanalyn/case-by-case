@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from accounts.services import ensure_player_profile
-from cases.definitions import CASE_DEFINITIONS
+from cases.definitions import CASE_DEFINITIONS, case_definition_for_slug
 from cases.models import Case, PlayerCaseProgress, PlayerClue
 from cases.services import (
     CaseLocked,
@@ -26,10 +26,17 @@ def card_for_title(cards, title):
 
 
 class CaseTests(TestCase):
-    def test_authored_case_definitions_have_unique_slugs(self):
-        slugs = [definition["slug"] for definition in CASE_DEFINITIONS]
+    def test_all_authored_case_definitions_load_in_explicit_order(self):
+        self.assertEqual(
+            [definition["slug"] for definition in CASE_DEFINITIONS],
+            ["missing-ledger", "cemetery-gate", "observatory-appointment"],
+        )
 
-        self.assertEqual(len(slugs), len(set(slugs)))
+    def test_case_definition_lookup_uses_stable_slug(self):
+        definition = case_definition_for_slug("missing-ledger")
+
+        self.assertEqual(definition["title"], "The Missing Ledger")
+        self.assertEqual(case_definition_for_slug("not-a-case"), {})
 
     def test_case_definition_validation_passes_for_authored_cases(self):
         self.assertEqual(validate_case_definitions(CASE_DEFINITIONS), [])
@@ -67,6 +74,42 @@ class CaseTests(TestCase):
         self.assertIn("broken-case, step 1: completion choice '' is missing a label.", errors)
         self.assertIn("broken-case, step 1: completion choice '' is missing outcome text.", errors)
         self.assertIn("broken-case, step 1: unknown stat 'also-unknown' in completion choice effects.", errors)
+
+    def test_case_definition_validation_rejects_duplicate_case_slugs(self):
+        definitions = [
+            {
+                "slug": "duplicate-case",
+                "starting_location_slug": "diner",
+                "requirements": {},
+                "completion_effects": {},
+                "clues": [("first-clue", "First clue", "", 1)],
+                "steps": [
+                    {
+                        "action": "finish",
+                        "location_slug": "diner",
+                        "clue": "first-clue",
+                        "next_step": 1,
+                    }
+                ],
+            },
+            {
+                "slug": "duplicate-case",
+                "starting_location_slug": "library",
+                "requirements": {},
+                "completion_effects": {},
+                "clues": [("second-clue", "Second clue", "", 1)],
+                "steps": [
+                    {
+                        "action": "finish",
+                        "location_slug": "library",
+                        "clue": "second-clue",
+                        "next_step": 1,
+                    }
+                ],
+            },
+        ]
+
+        self.assertIn("duplicate-case: duplicate case slug.", validate_case_definitions(definitions))
 
     def test_validate_case_definitions_command(self):
         output = StringIO()
