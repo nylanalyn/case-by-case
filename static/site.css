@@ -1,104 +1,927 @@
+/* Brindle Creek — rain-soaked coastal night.
+   Palette pulled from the location art: overcast blue-gray dark,
+   sodium-warm window light, one red neon accent, aged paper for
+   anything printed or pinned. */
+
+:root {
+  --night: #10161d;
+  --night-2: #151d26;
+  --night-3: #1b2530;
+  --night-edge: #2b3a47;
+  --mist: #c9d3d8;
+  --mist-dim: #8b9ba4;
+  --headline: #e9e4d8;
+  --sodium: #e0a64e;
+  --sodium-soft: #f0c987;
+  --sodium-dim: #9c7434;
+  --neon: #c4432f;
+  --neon-soft: #e06b52;
+  --pine: #2e4a42;
+  --paper: #ece3cd;
+  --paper-shade: #ddd1b4;
+  --paper-ink: #2b2620;
+  --paper-faint: #6d6350;
+}
+
 * {
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: dark;
+}
+
 body {
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(72, 96, 116, 0.28), transparent 60%),
+    radial-gradient(140% 120% at 50% 115%, rgba(0, 0, 0, 0.55), transparent 55%),
+    var(--night);
+  color: var(--mist);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.6;
   margin: 0;
-  background: #f4f1eb;
-  color: #25211c;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* faint rain streaks over everything, barely there */
+body::after {
+  background: repeating-linear-gradient(
+    112deg,
+    transparent 0px,
+    transparent 7px,
+    rgba(178, 199, 210, 0.05) 7px,
+    rgba(178, 199, 210, 0.05) 8px
+  );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 1;
 }
 
 a {
-  color: #315f72;
+  color: var(--sodium-soft);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
 }
+
+a:hover {
+  color: var(--neon-soft);
+}
+
+/* ---------- header ---------- */
 
 .site-header {
   align-items: center;
-  background: #25211c;
-  color: #f7f2e8;
+  background: linear-gradient(180deg, #0b1015, #10171f);
+  border-bottom: 1px solid #060a0e;
+  box-shadow: 0 1px 0 rgba(224, 166, 78, 0.12), 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: var(--mist);
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem max(1rem, calc((100% - 1120px) / 2));
+  position: relative;
 }
 
-.site-header a {
-  color: #f7f2e8;
+/* thin neon strip, like the diner trim */
+.site-header::after {
+  background: linear-gradient(90deg, transparent, var(--neon) 18%, var(--neon) 82%, transparent);
+  bottom: -3px;
+  content: "";
+  height: 2px;
+  left: 0;
+  opacity: 0.55;
+  position: absolute;
+  right: 0;
+}
+
+.brand {
+  color: var(--headline);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
   text-decoration: none;
 }
 
+.brand strong {
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+}
+
+.brand span {
+  color: var(--mist-dim);
+  font-family: system-ui, sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+}
+
+.brand:hover strong {
+  color: var(--sodium-soft);
+  text-shadow: 0 0 14px rgba(224, 166, 78, 0.35);
+}
+
 .nav {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  font-family: system-ui, sans-serif;
+  gap: 0.35rem 1rem;
+  justify-content: flex-end;
 }
+
+.nav a {
+  color: var(--mist);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: var(--sodium-soft);
+  text-shadow: 0 0 10px rgba(224, 166, 78, 0.4);
+}
+
+.nav form {
+  margin: 0;
+}
+
+.nav button {
+  background: transparent;
+  border: 0;
+  color: var(--mist-dim);
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  padding: 0;
+}
+
+.nav button:hover {
+  background: transparent;
+  color: var(--neon-soft);
+}
+
+/* the town clock — a lit window in the dark */
+.town-clock {
+  background: rgba(224, 166, 78, 0.08);
+  border: 1px solid var(--sodium-dim);
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(224, 166, 78, 0.18), inset 0 0 8px rgba(224, 166, 78, 0.1);
+  color: var(--sodium-soft);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  padding: 0.22rem 0.5rem;
+}
+
+/* ---------- layout ---------- */
 
 .container {
   margin: 0 auto;
-  max-width: 960px;
-  padding: 1.5rem 1rem 3rem;
+  max-width: 1080px;
+  min-height: calc(100vh - 105px);
+  padding: 2.2rem 1rem 5rem;
+  position: relative;
+  z-index: 2;
 }
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--headline);
+  line-height: 1.15;
+  margin: 0 0 0.6rem;
+}
+
+h1 {
+  border-bottom: 1px solid var(--night-edge);
+  font-size: 2.1rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  position: relative;
+}
+
+h1::after {
+  background: var(--sodium);
+  bottom: -1px;
+  box-shadow: 0 0 10px rgba(224, 166, 78, 0.6);
+  content: "";
+  height: 2px;
+  left: 0;
+  position: absolute;
+  width: 88px;
+}
+
+h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-top: 2.2rem;
+}
+
+h3 {
+  font-size: 1.05rem;
+}
+
+h4 {
+  color: var(--mist-dim);
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  margin-top: 1rem;
+  text-transform: uppercase;
+}
+
+p {
+  margin: 0 0 0.85rem;
+}
+
+small {
+  color: var(--mist-dim);
+  font-family: system-ui, sans-serif;
+  font-size: 0.76rem;
+}
+
+/* ---------- panels & cards ---------- */
 
 .panel,
 .card {
-  background: #fffaf2;
-  border: 1px solid #d8cbb8;
-  border-radius: 8px;
-  padding: 1rem;
+  background: linear-gradient(180deg, var(--night-3), var(--night-2));
+  border: 1px solid var(--night-edge);
+  border-radius: 3px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.panel {
+  border-left: 3px solid var(--sodium-dim);
+  padding: 1.25rem 1.4rem;
+}
+
+.card {
+  padding: 1.05rem 1.15rem;
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+
+.card:hover {
+  border-color: #43586a;
+}
+
+.card > :last-child,
+.panel > :last-child {
+  margin-bottom: 0;
+}
+
+.card > :first-child,
+.panel > :first-child {
+  margin-top: 0;
+}
+
+.card h2,
+.card h3 {
+  margin-top: 0;
+}
+
+.card h3 a,
+.card h2 a {
+  color: var(--headline);
+  text-decoration: none;
+}
+
+.card h3 a:hover,
+.card h2 a:hover {
+  color: var(--sodium-soft);
 }
 
 .grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* ---------- location imagery ---------- */
+
+.location-scene {
+  align-items: end;
+  background-color: var(--night-2);
+  background-position: center;
+  background-size: cover;
+  border: 1px solid #000;
+  border-radius: 3px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55), inset 0 0 120px rgba(0, 0, 0, 0.35);
+  display: flex;
+  min-height: 560px;
+  overflow: hidden;
+  padding: 1.2rem;
+}
+
+.location-scene.short {
+  min-height: 340px;
+}
+
+.location-intro {
+  backdrop-filter: blur(7px);
+  background: rgba(10, 15, 20, 0.78);
+  border: 1px solid rgba(139, 155, 164, 0.25);
+  border-left: 3px solid var(--sodium);
+  border-radius: 3px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  max-width: 580px;
+  padding: 1.15rem 1.35rem;
+}
+
+.location-intro h1 {
+  border-bottom: 0;
+  margin-top: 0.2rem;
+  padding-bottom: 0;
+}
+
+.location-intro h1::after {
+  display: none;
+}
+
+.location-intro > :last-child {
+  margin-bottom: 0;
+}
+
+.pass-time {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.pass-time label,
+.pass-time select {
+  margin: 0;
+}
+
+.location-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.location-grid .card {
+  display: flex;
+  flex-direction: column;
+}
+
+.location-thumbnail {
+  border-bottom: 1px solid #000;
+  display: block;
+  margin: -1.05rem -1.15rem 0.9rem;
+  overflow: hidden;
+}
+
+.location-thumbnail img {
+  aspect-ratio: 3 / 2;
+  display: block;
+  filter: saturate(0.96);
+  object-fit: cover;
+  transition: filter 180ms ease, transform 300ms ease;
+  width: 100%;
+}
+
+.card:hover .location-thumbnail img {
+  filter: saturate(1.05) brightness(1.12);
+  transform: scale(1.03);
+}
+
+/* ---------- NPCs ---------- */
+
+.npc-card {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.95rem;
+}
+
+.npc-portrait {
+  border: 1px solid #000;
+  border-radius: 3px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  flex: 0 0 92px;
+}
+
+.npc-portrait img {
+  aspect-ratio: 4 / 5;
+  border-radius: 2px;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 12%;
+  width: 92px;
+}
+
+.npc-portrait.empty {
+  align-items: center;
+  aspect-ratio: 4 / 5;
+  background: linear-gradient(180deg, #232f3a, #17202a);
+  color: var(--mist-dim);
+  display: flex;
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+  justify-content: center;
+  width: 92px;
+}
+
+.npc-role {
+  color: var(--sodium-soft);
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  margin: -0.35rem 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.npc-dialogue {
+  color: var(--mist);
+  font-style: italic;
+}
+
+/* ---------- status stamps ---------- */
+
+.stamp {
+  border: 1px solid var(--mist-dim);
+  border-radius: 2px;
+  color: var(--mist-dim);
+  display: inline-block;
+  font-family: system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  padding: 0.14rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.stamp-closed {
+  border-color: var(--neon);
+  color: var(--neon-soft);
+  text-shadow: 0 0 8px rgba(196, 67, 47, 0.35);
 }
 
 .actions {
-  color: #6b2f2f;
-  font-weight: 700;
+  color: var(--sodium-soft);
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
+
+/* ---------- paper: clues, notes, the newspaper ----------
+   Anything written down in Brindle Creek lives on damp paper. */
+
+.paper,
+.note-card,
+.clue-card {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 244, 0.5), transparent 30%),
+    var(--paper);
+  border: 1px solid #b3a583;
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  color: var(--paper-ink);
+}
+
+.paper a,
+.note-card a,
+.clue-card a {
+  color: #7a4a1e;
+}
+
+.paper h1,
+.paper h2,
+.paper h3,
+.note-card h3,
+.clue-card h3,
+.clue-card h4 {
+  color: var(--paper-ink);
+}
+
+.paper small,
+.note-card small,
+.clue-card small {
+  color: var(--paper-faint);
+}
+
+/* clue index cards read like typed case-file entries */
+.clue-card {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  padding: 1rem 1.15rem;
+}
+
+.clue-card h3 {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  margin-top: 0;
+  text-transform: uppercase;
+}
+
+.clue-card > :last-child {
+  margin-bottom: 0;
+}
+
+.clue-card.inset {
+  margin-bottom: 0.85rem;
+  padding: 0.75rem 0.9rem;
+}
+
+/* pinned board notes */
+.note-card {
+  font-style: italic;
+  margin-bottom: 0.9rem;
+  padding: 1rem 1.15rem 0.85rem;
+  position: relative;
+}
+
+.note-card::before {
+  background: radial-gradient(circle at 35% 30%, #e8887a, var(--neon) 55%, #7c2417);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  content: "";
+  height: 11px;
+  left: 50%;
+  position: absolute;
+  top: -5px;
+  transform: translateX(-50%);
+  width: 11px;
+}
+
+.note-card:nth-child(odd) {
+  transform: rotate(-0.4deg);
+}
+
+.note-card:nth-child(even) {
+  transform: rotate(0.35deg);
+}
+
+.note-card small {
+  display: block;
+  font-style: normal;
+  margin-top: 0.4rem;
+}
+
+.note-card form {
+  margin-top: 0.5rem;
+}
+
+.note-card button {
+  background: transparent;
+  border: 1px solid var(--paper-faint);
+  color: var(--paper-faint);
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.note-card button:hover {
+  background: transparent;
+  border-color: var(--neon);
+  color: var(--neon);
+}
+
+/* the Register: one broadsheet page */
+.newspaper-sheet {
+  background:
+    linear-gradient(90deg, transparent 49.55%, rgba(43, 38, 32, 0.06) 50%, transparent 50.45%),
+    linear-gradient(180deg, rgba(255, 253, 244, 0.55), transparent 26%),
+    var(--paper);
+  border: 1px solid #b3a583;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  color: var(--paper-ink);
+  margin: 1.2rem auto 0;
+  max-width: 900px;
+  padding: 1.9rem 2.4rem 2.2rem;
+}
+
+.newspaper-sheet a {
+  color: #7a4a1e;
+}
+
+.np-masthead {
+  border-top: 1px solid var(--paper-ink);
+  margin-bottom: 1.4rem;
+  text-align: center;
+}
+
+.np-masthead h1 {
+  border-bottom: 0;
+  color: var(--paper-ink);
+  font-size: clamp(1.9rem, 5.4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0.55rem 0 0.1rem;
+  padding-bottom: 0;
+}
+
+.np-masthead h1::after {
+  display: none;
+}
+
+.np-motto {
+  color: var(--paper-faint);
+  font-size: 0.82rem;
+  font-style: italic;
+  margin: 0 0 0.7rem;
+}
+
+.np-dateline {
+  border-bottom: 1px solid var(--paper-ink);
+  border-top: 3px double var(--paper-ink);
+  display: flex;
+  font-size: 0.72rem;
+  font-variant: small-caps;
+  justify-content: space-between;
+  letter-spacing: 0.12em;
+  padding: 0.28rem 0.1rem;
+}
+
+.np-lead {
+  border: 3px double var(--paper-ink);
+  margin: 0 auto 1.6rem;
+  max-width: 560px;
+  padding: 0.9rem 1.3rem 1rem;
+  text-align: center;
+}
+
+.np-lead h2 {
+  color: var(--paper-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.np-lead p {
+  font-size: 1.08rem;
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.np-section {
+  margin-bottom: 1.5rem;
+}
+
+.np-section > h2 {
+  align-items: center;
+  color: var(--paper-ink);
+  display: flex;
+  font-size: 0.85rem;
+  font-weight: 700;
+  gap: 0.8rem;
+  letter-spacing: 0.2em;
+  margin: 0 0 0.8rem;
+  text-transform: uppercase;
+}
+
+.np-section > h2::before,
+.np-section > h2::after {
+  border-top: 1px solid #a89871;
+  content: "";
+  flex: 1;
+}
+
+.np-columns {
+  column-gap: 2rem;
+  column-rule: 1px solid var(--paper-shade);
+  columns: 2;
+}
+
+.np-item {
+  break-inside: avoid;
+  hyphens: auto;
+  margin: 0 0 0.9rem;
+  text-align: justify;
+}
+
+.np-item h3 {
+  color: var(--paper-ink);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 0.3rem;
+  text-align: left;
+}
+
+.np-item p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.np-classifieds {
+  columns: 3;
+  font-size: 0.8rem;
+}
+
+.np-classifieds .np-item {
+  border-bottom: 1px dotted #a89871;
+  line-height: 1.45;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.np-weird {
+  border: 1px solid var(--paper-ink);
+  font-size: 0.86rem;
+  font-style: italic;
+  margin: 0 auto 0.7rem;
+  max-width: 460px;
+  padding: 0.55rem 0.9rem;
+  text-align: center;
+}
+
+.np-footer {
+  border-top: 3px double var(--paper-ink);
+  color: var(--paper-faint);
+  font-size: 0.72rem;
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  margin-top: 1.8rem;
+  padding-top: 0.45rem;
+  text-align: center;
+}
+
+/* ---------- forms & buttons ---------- */
 
 button,
 .button {
-  background: #315f72;
-  border: 0;
-  border-radius: 6px;
-  color: #fff;
+  background: rgba(224, 166, 78, 0.06);
+  border: 1px solid var(--sodium-dim);
+  border-radius: 2px;
+  color: var(--sodium-soft);
   cursor: pointer;
   display: inline-block;
-  font: inherit;
-  padding: 0.6rem 0.8rem;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  padding: 0.5rem 0.85rem;
   text-decoration: none;
+  transition: background 120ms ease, box-shadow 120ms ease, color 120ms ease;
+}
+
+button:hover,
+.button:hover {
+  background: var(--sodium);
+  box-shadow: 0 0 16px rgba(224, 166, 78, 0.35);
+  color: #14100a;
 }
 
 button:disabled {
-  background: #8e8a83;
+  background: transparent;
+  border-color: #3a4854;
+  box-shadow: none;
+  color: #5c6b76;
   cursor: not-allowed;
 }
 
 input,
-textarea {
-  border: 1px solid #b9ad9c;
-  border-radius: 6px;
+textarea,
+select {
+  background: #0d1319;
+  border: 1px solid var(--night-edge);
+  border-radius: 2px;
+  color: var(--mist);
   display: block;
   font: inherit;
   margin-bottom: 0.75rem;
   max-width: 100%;
-  padding: 0.55rem;
+  padding: 0.5rem 0.6rem;
   width: 100%;
 }
 
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--sodium-dim);
+  box-shadow: 0 0 0 2px rgba(224, 166, 78, 0.15);
+  outline: none;
+}
+
+select {
+  font-family: system-ui, sans-serif;
+  width: auto;
+}
+
+label {
+  color: var(--mist);
+  display: block;
+  font-family: system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+}
+
+form.panel {
+  max-width: 620px;
+}
+
+.helptext,
+form.panel ul {
+  color: var(--mist-dim);
+  font-family: system-ui, sans-serif;
+  font-size: 0.76rem;
+}
+
+.errorlist {
+  color: var(--neon-soft);
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  list-style: none;
+  margin: 0 0 0.4rem;
+  padding: 0;
+}
+
+/* ---------- flash messages ---------- */
+
 .messages {
   list-style: none;
+  margin: 0 0 1.2rem;
   padding: 0;
 }
 
 .messages li {
-  background: #e7f0df;
-  border: 1px solid #b9c9aa;
-  border-radius: 6px;
+  background: rgba(224, 166, 78, 0.08);
+  border: 1px solid rgba(224, 166, 78, 0.3);
+  border-left: 3px solid var(--sodium);
+  border-radius: 2px;
+  color: var(--sodium-soft);
+  font-family: system-ui, sans-serif;
+  font-size: 0.88rem;
   margin-bottom: 0.5rem;
-  padding: 0.6rem;
+  padding: 0.65rem 0.85rem;
+}
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--night-edge);
+  color: var(--mist-dim);
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  margin: 0 auto;
+  max-width: 1080px;
+  padding: 1.2rem 1rem 2rem;
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 760px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .nav {
+    justify-content: flex-start;
+  }
+
+  .container {
+    padding-top: 1.6rem;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+
+  .location-scene {
+    min-height: 420px;
+    padding: 0.75rem;
+  }
+
+  .location-scene.short {
+    min-height: 260px;
+  }
+
+  .location-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .newspaper-sheet {
+    padding: 1.2rem 1.1rem 1.5rem;
+  }
+
+  .np-columns {
+    columns: 1;
+  }
+
+  .np-classifieds {
+    columns: 2;
+  }
+
+  .np-dateline {
+    font-size: 0.62rem;
+  }
 }

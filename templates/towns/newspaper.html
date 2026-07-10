@@ -2,47 +2,68 @@
 {% block title %}{{ profile.town.name }} Register{% endblock %}
 {% block content %}
   <p><a href="{% url 'town_home' %}">Back to town</a></p>
-  <h1>The {{ profile.town.name }} Register</h1>
   <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
 
-  <section class="panel">
-    <h2>Morning Rumor</h2>
-    <p>{{ rumor }}</p>
-  </section>
+  <div class="newspaper-sheet">
+    <header class="np-masthead">
+      <h1>The {{ profile.town.name }} Register</h1>
+      <p class="np-motto">All the news that reaches us.</p>
+      <div class="np-dateline">
+        <span>{% now "l, F j, Y" %}</span>
+        <span>Rain, continuing</span>
+        <span>Fifty cents</span>
+      </div>
+    </header>
 
-  <h2>Recent Notices</h2>
-  {% for event in events %}
-    <article class="card">
-      <h3>{{ event.title }}</h3>
-      {% if event.body %}
-        <p>{{ event.body }}</p>
-      {% endif %}
-    </article>
-  {% empty %}
-    <p>The paper has nothing to print, which has not stopped it before.</p>
-  {% endfor %}
+    <section class="np-lead">
+      <h2>Morning Rumor</h2>
+      <p>{{ rumor }}</p>
+    </section>
 
-  <h2>Closed Cases</h2>
-  {% for event in solved_cases %}
-    <article class="card">
-      <h3>{{ event.title }}</h3>
-      <p>{{ event.body }}</p>
-    </article>
-  {% empty %}
-    <p>No cases closed recently.</p>
-  {% endfor %}
+    <section class="np-section">
+      <h2>Recent Notices</h2>
+      <div class="np-columns">
+        {% for event in events %}
+          <article class="np-item">
+            <h3>{{ event.title }}</h3>
+            {% if event.body %}<p>{{ event.body }}</p>{% endif %}
+          </article>
+        {% empty %}
+          <p class="np-item">The paper has nothing to print, which has not stopped it before.</p>
+        {% endfor %}
+      </div>
+    </section>
 
-  <h2>Classifieds</h2>
-  {% for classified in classifieds %}
-    <article class="card">
-      <p>{{ classified }}</p>
-    </article>
-  {% endfor %}
+    <section class="np-section">
+      <h2>Closed Cases</h2>
+      <div class="np-columns">
+        {% for event in solved_cases %}
+          <article class="np-item">
+            <h3>{{ event.title }}</h3>
+            <p>{{ event.body }}</p>
+          </article>
+        {% empty %}
+          <p class="np-item">No cases closed recently.</p>
+        {% endfor %}
+      </div>
+    </section>
 
-  <h2>Strange Notices</h2>
-  {% for notice in weird_notices %}
-    <article class="card">
-      <p>{{ notice }}</p>
-    </article>
-  {% endfor %}
+    <section class="np-section">
+      <h2>Classifieds</h2>
+      <div class="np-columns np-classifieds">
+        {% for classified in classifieds %}
+          <p class="np-item">{{ classified }}</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="np-section">
+      <h2>Strange Notices</h2>
+      {% for notice in weird_notices %}
+        <p class="np-weird">{{ notice }}</p>
+      {% endfor %}
+    </section>
+
+    <footer class="np-footer">The Register prints what it hears. The Register does not print corrections.</footer>
+  </div>
 {% endblock %}

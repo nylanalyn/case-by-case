@@ -1,9 +1,24 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ profile.town.name }}{% endblock %}
 {% block content %}
-  <h1>{{ profile.town.name }}</h1>
-  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
-  <p><a href="{% url 'newspaper' %}">Read today's paper</a></p>
+  <section class="location-scene short" style="background-image: url('{% static 'images/locations/town-square.png' %}');">
+    <div class="location-intro">
+      <h1>{{ profile.town.name }}</h1>
+      <p class="actions">{{ profile.current_time_label }} | {{ profile.daily_actions_remaining }} hours remaining today</p>
+      <p><a href="{% url 'newspaper' %}">Read today's paper</a></p>
+      <form method="post" action="{% url 'pass_time' %}" class="pass-time">
+        {% csrf_token %}
+        <label for="hours">Pass time</label>
+        <select id="hours" name="hours">
+          {% for hours in wait_options %}
+            <option value="{{ hours }}">{{ hours }} hour{% if hours != 1 %}s{% endif %}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Wait</button>
+      </form>
+    </div>
+  </section>
 
   <h2>Current leads</h2>
   <section class="grid">
@@ -18,9 +33,12 @@
   </section>
 
   <h2>Locations</h2>
-  <section class="grid">
+  <section class="grid location-grid">
     {% for location in locations %}
       <article class="card">
+        <a class="location-thumbnail" href="{% url 'location_detail' location.slug %}">
+          <img src="{% static 'images/locations/' %}{{ location.slug }}.png" alt="{{ location.name }}">
+        </a>
         <h3><a href="{% url 'location_detail' location.slug %}">{{ location.name }}</a></h3>
         <p>{{ location.description }}</p>
       </article>
@@ -34,11 +52,14 @@
         <h3><a href="{% url 'case_detail' card.case.id %}">{{ card.case.title }}</a></h3>
         <p>{{ card.case.summary }}</p>
         {% if not card.is_available %}
-          <p><strong>Locked.</strong> Needed: {{ card.requirements }}</p>
+          <p><span class="stamp">Not open yet</span></p>
+          {% if card.lock_text %}<p>{{ card.lock_text }}</p>{% endif %}
+          <p>Needed: {{ card.requirements }}</p>
         {% elif card.status == "complete" %}
-          <p><strong>Closed.</strong></p>
+          <p><span class="stamp stamp-closed">Case closed</span></p>
         {% elif card.action %}
           <p>Next lead: <a href="{% url 'location_detail' card.action.location_slug %}">{{ card.action.location_name }}</a></p>
+          {% if not card.action_is_available %}<p>{{ card.action_time_label }}</p>{% endif %}
         {% endif %}
       </article>
     {% empty %}

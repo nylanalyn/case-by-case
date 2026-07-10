@@ -5,6 +5,10 @@ class NotEnoughActions(Exception):
     pass
 
 
+class InvalidWait(Exception):
+    pass
+
+
 @transaction.atomic
 def spend_action(player, amount=1, reason="act"):
     locked = type(player).objects.select_for_update().get(pk=player.pk)
@@ -14,3 +18,9 @@ def spend_action(player, amount=1, reason="act"):
     locked.save(update_fields=["daily_actions_remaining"])
     player.daily_actions_remaining = locked.daily_actions_remaining
     return locked.daily_actions_remaining
+
+
+def pass_time(player, hours):
+    if hours < 1:
+        raise InvalidWait("Choose at least one hour to pass.")
+    return spend_action(player, amount=hours, reason="pass that much time")

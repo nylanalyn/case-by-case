@@ -16,8 +16,8 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(NPC)
 class NPCAdmin(admin.ModelAdmin):
-    list_display = ("name", "town", "home_location", "role")
-    list_filter = ("town", "home_location")
+    list_display = ("name", "slug", "town", "home_location", "role", "is_townsfolk")
+    list_filter = ("town", "home_location", "is_townsfolk")
 
 
 @admin.register(TownEvent)

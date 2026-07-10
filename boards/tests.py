@@ -18,7 +18,7 @@ class BoardTests(TestCase):
         self.assertEqual(MessageBoardPost.objects.filter(town=profile.town, location=location).count(), 1)
         self.assertEqual(TownEvent.objects.filter(town=profile.town, title__contains="left a note").count(), 1)
         profile.refresh_from_db()
-        self.assertEqual(profile.daily_actions_remaining, 19)
+        self.assertEqual(profile.daily_actions_remaining, 23)
 
     def test_note_content_is_not_copied_into_town_events(self):
         user = User.objects.create_user(username="rumi", password="safe-password-123")

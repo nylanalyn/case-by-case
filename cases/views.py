@@ -9,6 +9,8 @@ from turns.services import NotEnoughActions
 from .models import Case, PlayerClue
 from .services import (
     CaseLocked,
+    CaseUnavailableAtThisTime,
+    InvalidCaseResolution,
     WrongLocation,
     advance_case,
     available_case_action,
@@ -54,8 +56,13 @@ def advance_case_view(request, case_id):
     if location_slug:
         location = get_object_or_404(Location, town=profile.town, slug=location_slug)
     try:
-        _progress, clue = advance_case(profile, case, location=location)
-    except (CaseLocked, NotEnoughActions, WrongLocation) as exc:
+        _progress, clue = advance_case(
+            profile,
+            case,
+            location=location,
+            completion_key=request.POST.get("completion_key"),
+        )
+    except (CaseLocked, CaseUnavailableAtThisTime, InvalidCaseResolution, NotEnoughActions, WrongLocation) as exc:
         messages.error(request, str(exc))
     else:
         if clue:

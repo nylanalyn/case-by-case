@@ -1,9 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Case by Case{% endblock %}
 {% block content %}
-  <section class="panel">
-    <h1>Case by Case</h1>
-    <p>A daily-turn mystery game about returning to Brindle Creek and noticing what changed.</p>
-    <p><a class="button" href="{% url 'register' %}">Enter town</a></p>
+  <section class="location-scene" style="background-image: url('{% static 'images/locations/town-square.png' %}');">
+    <div class="location-intro">
+      <h1>Case by Case</h1>
+      <p>A daily-turn mystery game about returning to Brindle Creek and noticing what changed.</p>
+      <p><a class="button" href="{% url 'register' %}">Enter town</a> <a class="button" href="{% url 'login' %}">Log in</a></p>
+    </div>
   </section>
 {% endblock %}

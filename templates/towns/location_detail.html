@@ -1,20 +1,30 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ location.name }}{% endblock %}
 {% block content %}
-  <p><a href="{% url 'town_home' %}">Back to town</a></p>
-  <h1>{{ location.name }}</h1>
-  <p class="actions">{{ profile.daily_actions_remaining }} actions remaining today</p>
-  <section class="panel">
-    <p>{{ location.description }}</p>
+  <section class="location-scene" style="background-image: url('{% static 'images/locations/' %}{{ location.slug }}.png');">
+    <div class="location-intro">
+      <p><a href="{% url 'town_home' %}">Back to town</a></p>
+      <h1>{{ location.name }}</h1>
+      <p class="actions">{{ profile.current_time_label }} | {{ profile.daily_actions_remaining }} hours remaining today</p>
+      <p>{{ location.description }}</p>
+    </div>
   </section>
 
   <h2>People here</h2>
   <section class="grid">
-    {% for npc in location.npcs.all %}
-      <article class="card">
-        <h3>{{ npc.name }}</h3>
-        <p><strong>{{ npc.role }}</strong></p>
-        <p>{{ npc.dialogue }}</p>
+    {% for npc in npcs %}
+      <article class="card npc-card">
+        {% if npc.portrait %}
+          <span class="npc-portrait"><img src="{% static npc.portrait %}" alt="{{ npc.name }}"></span>
+        {% else %}
+          <span class="npc-portrait empty">{{ npc.name|first }}</span>
+        {% endif %}
+        <div>
+          <h3>{{ npc.name }}</h3>
+          <p class="npc-role">{{ npc.role }}</p>
+          <p class="npc-dialogue">{{ npc.display_dialogue }}</p>
+        </div>
       </article>
     {% empty %}
       <p>No one is lingering here.</p>
@@ -27,17 +37,38 @@
       <h3><a href="{% url 'case_detail' card.case.id %}">{{ card.case.title }}</a></h3>
       <p>{{ card.case.summary }}</p>
       {% if not card.is_available %}
-        <p><strong>Locked.</strong> Needed: {{ card.requirements }}</p>
+        <p><span class="stamp">Not open yet</span></p>
+        {% if card.lock_text %}<p>{{ card.lock_text }}</p>{% endif %}
+        <p>Needed: {{ card.requirements }}</p>
       {% elif card.progress.status == "complete" %}
-        <p><strong>Closed:</strong> {{ card.case.outcome_text }}</p>
+        <p><span class="stamp stamp-closed">Case closed</span> {{ card.outcome_text }}</p>
       {% elif card.action and card.action.location_slug == location.slug %}
+        {% if not card.action_is_available %}
+          <p>{{ card.action_time_label }}</p>
+        {% else %}
         <form method="post" action="{% url 'advance_case' card.case.id %}">
           {% csrf_token %}
           <input type="hidden" name="location_slug" value="{{ location.slug }}">
-          <button type="submit" {% if profile.daily_actions_remaining == 0 %}disabled{% endif %}>{{ card.action.label }}</button>
+          {% if card.action.completion_choices %}
+            <p>{{ card.action.label }}</p>
+            {% for choice in card.action.completion_choices %}
+              <button type="submit" name="completion_key" value="{{ choice.key }}" {% if profile.daily_actions_remaining == 0 %}disabled{% endif %}>{{ choice.label }}</button>
+            {% endfor %}
+          {% else %}
+            <button type="submit" {% if profile.daily_actions_remaining == 0 %}disabled{% endif %}>{{ card.action.label }}</button>
+          {% endif %}
         </form>
+        {% endif %}
       {% elif card.action %}
         <p>Next lead: <a href="{% url 'location_detail' card.action.location_slug %}">{{ card.action.location_name }}</a></p>
+        {% if not card.action_is_available %}<p>{{ card.action_time_label }}</p>{% endif %}
+      {% endif %}
+      {% if card.found_clue %}
+        <h4>Latest finding</h4>
+        <div class="clue-card inset">
+          <h3>{{ card.found_clue.clue.title }}</h3>
+          <p>{{ card.found_clue.clue.text }}</p>
+        </div>
       {% endif %}
     </article>
   {% empty %}
@@ -52,7 +83,7 @@
     <button type="submit" {% if profile.daily_actions_remaining == 0 %}disabled{% endif %}>Leave a note</button>
   </form>
   {% for post in posts %}
-    <article class="card">
+    <article class="note-card">
       <p>{{ post.content }}</p>
       <small>{{ post.player.user.username }} pinned this on {{ post.created_at }}</small>
       {% if post.player_id == profile.id or user.is_staff %}

@@ -30,14 +30,18 @@ class Location(models.Model):
 
 class NPC(models.Model):
     town = models.ForeignKey(Town, on_delete=models.CASCADE, related_name="npcs")
+    slug = models.SlugField(max_length=80)
     name = models.CharField(max_length=120)
     home_location = models.ForeignKey(Location, on_delete=models.PROTECT, related_name="npcs")
     role = models.CharField(max_length=120)
     personality_tags = models.CharField(max_length=200, blank=True)
     dialogue = models.TextField()
     portrait_recipe = models.JSONField(default=dict, blank=True)
+    daily_schedule = models.JSONField(default=list, blank=True)
+    is_townsfolk = models.BooleanField(default=False)
 
     class Meta:
+        unique_together = ("town", "slug")
         ordering = ["name"]
 
     def __str__(self):

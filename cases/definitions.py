@@ -38,11 +38,33 @@ CASE_DEFINITIONS = [
             },
             {
                 "action": "finish",
-                "label": "Close the ledger case",
+                "label": "Decide what to do with the receipt",
                 "location_slug": "river-walk",
                 "location_name": "River Walk",
                 "clue": "river-receipt",
                 "next_step": 4,
+                "completion_choices": [
+                    {
+                        "key": "report-the-scheme",
+                        "label": "Bring the receipt to Deputy Halden",
+                        "outcome_text": "Halden opens a quiet investigation into the petty cash scheme. Mara keeps serving bad coffee, but she stops asking who saw the ledger first.",
+                        "completion_effects": {
+                            "town_trust": 1,
+                            "diner_trust": 1,
+                            "sheriff_trust": 1,
+                        },
+                    },
+                    {
+                        "key": "leave-it-with-mara",
+                        "label": "Leave the receipt with Mara",
+                        "outcome_text": "Mara settles the missing cash before anyone files a report. The diner closes the books early for a week, and the river receipt is never mentioned again.",
+                        "completion_effects": {
+                            "diner_trust": 2,
+                            "town_trust": -1,
+                            "sheriff_trust": -1,
+                        },
+                    },
+                ],
             },
         ],
         "clues": [
@@ -115,6 +137,7 @@ CASE_DEFINITIONS = [
         "requirements": {
             "weirdness_tolerance": 1,
         },
+        "lock_text": "Iris will not put the observatory appointment in your hands until you have seen Brindle Creek be stranger than a scheduling error.",
         "completion_effects": {
             "weirdness_tolerance": 1,
             "observatory_trust": 1,

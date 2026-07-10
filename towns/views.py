@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles import finders
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.services import ensure_player_profile
@@ -7,10 +8,11 @@ from boards.forms import MessageBoardPostForm
 from boards.models import MessageBoardPost
 from boards.services import BoardCooldownError, create_post
 from cases.services import case_cards_for_location, case_cards_for_player
-from turns.services import NotEnoughActions
+from turns.services import InvalidWait, NotEnoughActions, pass_time
 
 from .models import Location, TownEvent
 from .newspaper import CLASSIFIEDS, WEIRD_NOTICES, current_rumor
+from .schedules import npc_dialogue, npcs_at_location
 from .seed import ensure_initial_town
 
 
@@ -41,8 +43,24 @@ def town_home(request):
             "events": events,
             "case_cards": case_cards,
             "current_leads": current_leads,
+            "wait_options": range(1, profile.daily_actions_remaining + 1),
         },
     )
+
+
+@login_required
+def pass_time_view(request):
+    if request.method != "POST":
+        return redirect("town_home")
+    profile = ensure_player_profile(request.user)
+    try:
+        hours = int(request.POST.get("hours", "0"))
+        pass_time(profile, hours)
+    except (InvalidWait, NotEnoughActions, ValueError) as exc:
+        messages.error(request, str(exc) if str(exc) else "Choose a valid number of hours.")
+    else:
+        messages.success(request, f"Time passes. It is now {profile.current_time_label}.")
+    return redirect("town_home")
 
 
 @login_required
@@ -90,8 +108,13 @@ def location_detail(request, slug):
 
     posts = MessageBoardPost.objects.filter(town=profile.town, location=location, is_hidden=False).select_related("player__user")
     case_cards = case_cards_for_location(profile, location)
+    npcs = npcs_at_location(profile.town, location, profile.current_hour)
+    for npc in npcs:
+        portrait = f"images/npcs/{npc.slug}.png"
+        npc.portrait = portrait if finders.find(portrait) else None
+        npc.display_dialogue = npc_dialogue(npc, location, profile.current_hour)
     return render(
         request,
         "towns/location_detail.html",
-        {"profile": profile, "location": location, "form": form, "posts": posts, "case_cards": case_cards},
+        {"profile": profile, "location": location, "form": form, "posts": posts, "case_cards": case_cards, "npcs": npcs},
     )

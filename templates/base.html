@@ -4,14 +4,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
     <title>{% block title %}Case by Case{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'site.css' %}">
   </head>
   <body>
     <header class="site-header">
-      <a href="{% url 'home' %}"><strong>Case by Case</strong></a>
+      <a class="brand" href="{% url 'home' %}"><strong>Case by Case</strong><span>Brindle Creek</span></a>
       <nav class="nav">
         {% if user.is_authenticated %}
+          {% if profile %}<span class="town-clock">{{ profile.current_time_label }}</span>{% endif %}
           <a href="{% url 'town_home' %}">Town</a>
           <a href="{% url 'newspaper' %}">Newspaper</a>
           <a href="{% url 'town_history' %}">History</a>
@@ -38,5 +40,6 @@
       {% endif %}
       {% block content %}{% endblock %}
     </main>
+    <footer class="site-footer">Brindle Creek — it rains here, mostly.</footer>
   </body>
 </html>

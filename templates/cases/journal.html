@@ -11,11 +11,14 @@
         <h3><a href="{% url 'case_detail' record.case.id %}">{{ record.case.title }}</a></h3>
         <p>{{ record.case.summary }}</p>
         {% if not record.is_available %}
-          <p><strong>Locked.</strong> Needed: {{ record.requirements }}</p>
+          <p><span class="stamp">Not open yet</span></p>
+          {% if record.lock_text %}<p>{{ record.lock_text }}</p>{% endif %}
+          <p>Needed: {{ record.requirements }}</p>
         {% elif record.status == "complete" %}
-          <p><strong>Closed.</strong> {{ record.case.outcome_text }}</p>
+          <p><span class="stamp stamp-closed">Case closed</span> {{ record.outcome_text }}</p>
         {% elif record.action %}
           <p>Next lead: <a href="{% url 'location_detail' record.action.location_slug %}">{{ record.action.location_name }}</a></p>
+          {% if not record.action_is_available %}<p>{{ record.action_time_label }}</p>{% endif %}
         {% endif %}
 
         <h4>Evidence</h4>
@@ -32,9 +35,9 @@
 
   <h2>All clues</h2>
   {% for player_clue in clues %}
-    <article class="card">
+    <article class="clue-card inset">
       <h3>{{ player_clue.clue.title }}</h3>
-      <p><strong>{{ player_clue.clue.case.title }}</strong></p>
+      <p><small>{{ player_clue.clue.case.title }}</small></p>
       <p>{{ player_clue.clue.text }}</p>
     </article>
   {% empty %}

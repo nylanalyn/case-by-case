@@ -16,11 +16,28 @@ LOCATION_DATA = [
 ]
 
 NPC_DATA = [
-    ("Mara Bell", "diner", "Diner worker", "Mara remembers every breakfast order and almost every lie."),
-    ("Deputy Halden Price", "sheriffs-office", "Deputy", "Halden writes careful notes in a notebook with a cracked cover."),
-    ("Iris Vale", "library", "Librarian", "Iris keeps the old town ledgers in better shape than the town keeps itself."),
-    ("Nico Saye", "bus-depot", "Bus depot clerk", "Nico says buses arrive late, early, or wrong."),
-    ("June Arlet", "cemetery", "Cemetery caretaker", "June trims the grass and refuses to discuss the north gate."),
+    ("mara-bell", "Mara Bell", "diner", "Diner worker", "Mara remembers every breakfast order and almost every lie."),
+    ("halden-price", "Deputy Halden Price", "sheriffs-office", "Deputy", "Halden writes careful notes in a notebook with a cracked cover."),
+    ("iris-vale", "Iris Vale", "library", "Librarian", "Iris keeps the old town ledgers in better shape than the town keeps itself."),
+    ("nico-saye", "Nico Saye", "bus-depot", "Bus depot clerk", "Nico says buses arrive late, early, or wrong."),
+    ("june-arlet", "June Arlet", "cemetery", "Cemetery caretaker", "June trims the grass and refuses to discuss the north gate."),
+]
+
+# These are ordinary, recognizable Brindle Creek residents.  They are not case
+# contacts yet; their locations and incidental dialogue are supplied by
+# towns.schedules so they can make the town feel lived in without authoring a
+# schedule for every person.
+TOWNSFOLK_DATA = [
+    ("beverly-kett", "Beverly Kett", "town-square", "Retired postal clerk", "Keeps an eye on the weather and everyone else's business."),
+    ("colin-voss", "Colin Voss", "river-walk", "Dock repairer", "Usually smells faintly of river water and machine oil."),
+    ("darlene-mott", "Darlene Mott", "diner", "School bus driver", "Knows which streets flood before the town does."),
+    ("elliot-ward", "Elliot Ward", "library", "Night-shift stocker", "Sleeps at unusual hours and notices empty shelves."),
+    ("frances-pell", "Frances Pell", "cemetery", "Florist", "Carries an umbrella only when she remembers."),
+    ("gabriel-shaw", "Gabriel Shaw", "bus-depot", "Appliance repairer", "Always seems to be between one errand and another."),
+    ("helen-rook", "Helen Rook", "observatory", "Former science teacher", "Still points out constellations through the clouds."),
+    ("jasper-quill", "Jasper Quill", "town-square", "Handyman", "Has paint on his cuffs and a theory about every loose board."),
+    ("lila-barnes", "Lila Barnes", "library", "Bakery assistant", "Gets up before the town and is never quite over it."),
+    ("martin-crowe", "Martin Crowe", "sheriffs-office", "Volunteer firekeeper", "Speaks softly, except when discussing faulty wiring."),
 ]
 
 
@@ -81,15 +98,49 @@ def ensure_town_content(town):
             },
         )
         locations[slug] = location
-    for name, location_slug, role, dialogue in NPC_DATA:
+    for slug, name, location_slug, role, dialogue in NPC_DATA:
+        npc = NPC.objects.filter(town=town, slug=slug).first()
+        legacy_npcs = NPC.objects.filter(town=town, name=name)
+        if npc is None:
+            # Before stable slugs, the deputy was stored as
+            # "deputy-halden-price" from their display name. Reuse that row
+            # rather than creating a second Halden.
+            npc = legacy_npcs.first()
+            if npc is not None:
+                npc.slug = slug
+                npc.save(update_fields=["slug"])
+        if npc is None:
+            npc = NPC.objects.create(
+                town=town,
+                slug=slug,
+                name=name,
+                home_location=locations[location_slug],
+                role=role,
+                dialogue=dialogue,
+                personality_tags="grounded, observant",
+            )
+        elif not npc.name:
+            # Repair rows created by the first stable-slug seed pass, which
+            # supplied a slug but accidentally omitted the display name.
+            npc.name = name
+            npc.save(update_fields=["name"])
+
+        # If the first stable-slug pass already created a canonical row, the
+        # legacy display-name row is now redundant. NPCs are not referenced by
+        # foreign keys, so removing it cannot orphan game progress.
+        legacy_npcs.exclude(pk=npc.pk).delete()
+    for slug, name, location_slug, role, description in TOWNSFOLK_DATA:
         NPC.objects.get_or_create(
             town=town,
-            name=name,
+            slug=slug,
             defaults={
+                "name": name,
                 "home_location": locations[location_slug],
                 "role": role,
-                "dialogue": dialogue,
-                "personality_tags": "grounded, observant",
+                "dialogue": description,
+                "personality_tags": "local, passing through",
+                "portrait_recipe": {"portrait": slug},
+                "is_townsfolk": True,
             },
         )
     ensure_cases(town, locations)

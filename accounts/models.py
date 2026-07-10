@@ -13,3 +13,15 @@ class PlayerProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    @property
+    def current_hour(self):
+        from turns.time import current_hour
+
+        return current_hour(self)
+
+    @property
+    def current_time_label(self):
+        from turns.time import format_hour
+
+        return format_hour(self.current_hour)

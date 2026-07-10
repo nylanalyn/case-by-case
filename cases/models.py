@@ -52,6 +52,7 @@ class PlayerCaseProgress(models.Model):
     started_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    completion_key = models.SlugField(max_length=80, blank=True)
 
     class Meta:
         unique_together = ("player", "case")

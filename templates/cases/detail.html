@@ -7,17 +7,20 @@
   <section class="panel">
     <p>{{ case.summary }}</p>
     {% if not card.is_available %}
-      <p><strong>Locked.</strong> Needed: {{ card.requirements }}</p>
+      <p><span class="stamp">Not open yet</span></p>
+      {% if card.lock_text %}<p>{{ card.lock_text }}</p>{% endif %}
+      <p>Needed: {{ card.requirements }}</p>
     {% elif progress.status == "complete" %}
-      <p><strong>Closed:</strong> {{ case.outcome_text }}</p>
+      <p><span class="stamp stamp-closed">Case closed</span> {{ card.outcome_text }}</p>
     {% elif action %}
       <p>Next lead: <a href="{% url 'location_detail' action.location_slug %}">{{ action.location_name }}</a></p>
+      {% if not card.action_is_available %}<p>{{ card.action_time_label }}</p>{% endif %}
     {% endif %}
   </section>
 
   <h2>Collected clues</h2>
   {% for player_clue in clues %}
-    <article class="card">
+    <article class="clue-card inset">
       <h3>{{ player_clue.clue.title }}</h3>
       <p>{{ player_clue.clue.text }}</p>
     </article>

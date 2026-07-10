@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.test import TestCase
 
 from accounts.services import apply_stat_changes, ensure_player_profile
@@ -15,7 +16,7 @@ class AccountTests(TestCase):
 
         self.assertEqual(profile.town.slug, "brindle-creek")
         self.assertNotEqual(user.password, "safe-password-123")
-        self.assertEqual(profile.daily_actions_remaining, 20)
+        self.assertEqual(profile.daily_actions_remaining, settings.DAILY_ACTION_ALLOWANCE)
 
     def test_existing_old_town_slug_is_renamed(self):
         old_town = Town.objects.create(slug="deep-archive", name="Deep Archive")
